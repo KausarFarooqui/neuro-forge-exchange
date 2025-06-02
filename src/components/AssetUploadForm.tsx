@@ -1,21 +1,21 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Upload, Github, Link, DollarSign, Tag, FileText } from 'lucide-react';
+import { Upload, Github, Link, DollarSign } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import AssetTypeSelector from './AssetUpload/AssetTypeSelector';
+import LicenseTypeSelector from './AssetUpload/LicenseTypeSelector';
+import TagManager from './AssetUpload/TagManager';
+import FileUploadArea from './AssetUpload/FileUploadArea';
+import { useAssetUpload, type AssetFormData } from '@/hooks/useAssetUpload';
 
 const AssetUploadForm = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const [uploading, setUploading] = useState(false);
-  const [formData, setFormData] = useState({
+  const { uploadAsset, uploading } = useAssetUpload();
+  const [formData, setFormData] = useState<AssetFormData>({
     name: '',
     description: '',
     asset_type: '',
@@ -24,138 +24,13 @@ const AssetUploadForm = () => {
     github_url: '',
     model_url: '',
     initial_price: '10.00',
-    tags: [] as string[],
+    tags: [],
   });
-  const [tagInput, setTagInput] = useState('');
   const [file, setFile] = useState<File | null>(null);
-
-  const assetTypes = [
-    { value: 'model', label: 'AI Model' },
-    { value: 'dataset', label: 'Dataset' },
-    { value: 'api', label: 'API' },
-    { value: 'framework', label: 'Framework' },
-    { value: 'tool', label: 'Tool' },
-    { value: 'company_share', label: 'Company Share' }
-  ];
-
-  const licenseTypes = [
-    { value: 'mit', label: 'MIT License' },
-    { value: 'apache', label: 'Apache 2.0' },
-    { value: 'commercial', label: 'Commercial' },
-    { value: 'proprietary', label: 'Proprietary' },
-    { value: 'cc0', label: 'CC0 (Public Domain)' },
-    { value: 'custom', label: 'Custom License' }
-  ];
-
-  const addTag = () => {
-    if (tagInput.trim() && !formData.tags.includes(tagInput.trim())) {
-      setFormData(prev => ({
-        ...prev,
-        tags: [...prev.tags, tagInput.trim()]
-      }));
-      setTagInput('');
-    }
-  };
-
-  const removeTag = (tagToRemove: string) => {
-    setFormData(prev => ({
-      ...prev,
-      tags: prev.tags.filter(tag => tag !== tagToRemove)
-    }));
-  };
-
-  const handleFileUpload = async (file: File) => {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Date.now()}.${fileExt}`;
-    const filePath = `assets/${fileName}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from('ai-assets')
-      .upload(filePath, file);
-
-    if (uploadError) {
-      throw uploadError;
-    }
-
-    return filePath;
-  };
-
-  const generateTickerSymbol = async (name: string) => {
-    const { data, error } = await supabase.rpc('generate_ticker_symbol', {
-      asset_name: name
-    });
-
-    if (error) {
-      console.error('Error generating ticker:', error);
-      return name.substring(0, 6).toUpperCase();
-    }
-
-    return data;
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setUploading(true);
-
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        toast({
-          title: "Authentication Required",
-          description: "Please log in to upload assets.",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      let filePath = '';
-      if (file) {
-        filePath = await handleFileUpload(file);
-      }
-
-      const tickerSymbol = await generateTickerSymbol(formData.name);
-
-      const { data, error } = await supabase
-        .from('ai_assets')
-        .insert([{
-          owner_id: user.id,
-          name: formData.name,
-          description: formData.description,
-          asset_type: formData.asset_type as any,
-          license_type: formData.license_type as any,
-          custom_license_terms: formData.custom_license_terms || null,
-          github_url: formData.github_url || null,
-          model_url: formData.model_url || null,
-          file_path: filePath || null,
-          initial_price: parseFloat(formData.initial_price),
-          current_price: parseFloat(formData.initial_price),
-          ticker_symbol: tickerSymbol,
-          tags: formData.tags
-        }])
-        .select()
-        .single();
-
-      if (error) {
-        throw error;
-      }
-
-      toast({
-        title: "Asset Uploaded Successfully!",
-        description: `Your asset "${formData.name}" has been submitted for review with ticker symbol ${tickerSymbol}.`
-      });
-
-      navigate('/dashboard');
-    } catch (error: any) {
-      console.error('Upload error:', error);
-      toast({
-        title: "Upload Failed",
-        description: error.message || "Failed to upload asset. Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setUploading(false);
-    }
+    await uploadAsset(formData, file);
   };
 
   return (
@@ -191,21 +66,10 @@ const AssetUploadForm = () => {
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-300">Asset Type *</label>
-                  <Select required value={formData.asset_type} onValueChange={(value) => setFormData(prev => ({ ...prev, asset_type: value }))}>
-                    <SelectTrigger className="bg-slate-800 border-slate-600 text-white">
-                      <SelectValue placeholder="Select asset type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {assetTypes.map((type) => (
-                        <SelectItem key={type.value} value={type.value}>
-                          {type.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                <AssetTypeSelector
+                  value={formData.asset_type}
+                  onChange={(value) => setFormData(prev => ({ ...prev, asset_type: value }))}
+                />
               </div>
 
               <div className="space-y-2">
@@ -220,21 +84,10 @@ const AssetUploadForm = () => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-300">License Type *</label>
-                  <Select required value={formData.license_type} onValueChange={(value) => setFormData(prev => ({ ...prev, license_type: value }))}>
-                    <SelectTrigger className="bg-slate-800 border-slate-600 text-white">
-                      <SelectValue placeholder="Select license" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {licenseTypes.map((license) => (
-                        <SelectItem key={license.value} value={license.value}>
-                          {license.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                <LicenseTypeSelector
+                  value={formData.license_type}
+                  onChange={(value) => setFormData(prev => ({ ...prev, license_type: value }))}
+                />
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-slate-300">Initial Price (USD) *</label>
@@ -293,50 +146,12 @@ const AssetUploadForm = () => {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-300">Upload File (Optional)</label>
-                <div className="border-2 border-dashed border-slate-600 rounded-lg p-6 bg-slate-800/50">
-                  <input
-                    type="file"
-                    onChange={(e) => setFile(e.target.files?.[0] || null)}
-                    className="w-full text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-blue-600 file:text-white hover:file:bg-blue-700"
-                  />
-                  <p className="text-sm text-slate-400 mt-2">
-                    Upload model files, datasets, or documentation (Max 100MB)
-                  </p>
-                </div>
-              </div>
+              <FileUploadArea onFileChange={setFile} />
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-300">Tags</label>
-                <div className="flex gap-2">
-                  <div className="relative flex-1">
-                    <Tag className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
-                    <Input
-                      value={tagInput}
-                      onChange={(e) => setTagInput(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
-                      placeholder="Add tags (e.g., NLP, Computer Vision, GPT)"
-                      className="bg-slate-800 border-slate-600 text-white pl-10"
-                    />
-                  </div>
-                  <Button type="button" onClick={addTag} variant="outline" className="border-slate-600">
-                    Add
-                  </Button>
-                </div>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {formData.tags.map((tag) => (
-                    <Badge
-                      key={tag}
-                      variant="secondary"
-                      className="bg-blue-500/20 text-blue-400 border-blue-500/30 cursor-pointer"
-                      onClick={() => removeTag(tag)}
-                    >
-                      {tag} ×
-                    </Badge>
-                  ))}
-                </div>
-              </div>
+              <TagManager
+                tags={formData.tags}
+                onTagsChange={(tags) => setFormData(prev => ({ ...prev, tags }))}
+              />
 
               <div className="flex gap-4 pt-6">
                 <Button
