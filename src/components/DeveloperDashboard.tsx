@@ -58,7 +58,7 @@ const DeveloperDashboard = () => {
     );
   };
 
-  const totalEarnings = assets?.reduce((sum, asset) => sum + parseFloat(asset.total_revenue || '0'), 0) || 0;
+  const totalEarnings = assets?.reduce((sum, asset) => sum + parseFloat(String(asset.total_revenue || 0)), 0) || 0;
   const totalDownloads = assets?.reduce((sum, asset) => sum + (asset.download_count || 0), 0) || 0;
   const avgRating = assets?.length ? assets.reduce((sum, asset) => sum + (asset.rating || 0), 0) / assets.length : 0;
 
@@ -152,7 +152,7 @@ const DeveloperDashboard = () => {
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                         <div>
                           <span className="text-slate-400">Current Price:</span>
-                          <div className="text-white font-medium">${parseFloat(asset.current_price).toFixed(2)}</div>
+                          <div className="text-white font-medium">${parseFloat(String(asset.current_price || 0)).toFixed(2)}</div>
                         </div>
                         <div>
                           <span className="text-slate-400">Downloads:</span>
@@ -160,7 +160,7 @@ const DeveloperDashboard = () => {
                         </div>
                         <div>
                           <span className="text-slate-400">Revenue:</span>
-                          <div className="text-green-400 font-medium">${parseFloat(asset.total_revenue || '0').toFixed(2)}</div>
+                          <div className="text-green-400 font-medium">${parseFloat(String(asset.total_revenue || 0)).toFixed(2)}</div>
                         </div>
                         <div>
                           <span className="text-slate-400">Rating:</span>

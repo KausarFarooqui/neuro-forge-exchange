@@ -118,12 +118,12 @@ const AssetUploadForm = () => {
 
       const { data, error } = await supabase
         .from('ai_assets')
-        .insert({
+        .insert([{
           owner_id: user.id,
           name: formData.name,
           description: formData.description,
-          asset_type: formData.asset_type,
-          license_type: formData.license_type,
+          asset_type: formData.asset_type as any,
+          license_type: formData.license_type as any,
           custom_license_terms: formData.custom_license_terms || null,
           github_url: formData.github_url || null,
           model_url: formData.model_url || null,
@@ -132,7 +132,7 @@ const AssetUploadForm = () => {
           current_price: parseFloat(formData.initial_price),
           ticker_symbol: tickerSymbol,
           tags: formData.tags
-        })
+        }])
         .select()
         .single();
 
