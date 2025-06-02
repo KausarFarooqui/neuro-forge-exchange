@@ -9,16 +9,258 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      ai_assets: {
+        Row: {
+          api_call_count: number | null
+          asset_type: Database["public"]["Enums"]["asset_type"]
+          created_at: string
+          current_price: number | null
+          custom_license_terms: string | null
+          description: string | null
+          download_count: number | null
+          file_path: string | null
+          github_url: string | null
+          id: string
+          initial_price: number | null
+          license_type: Database["public"]["Enums"]["license_type"]
+          model_url: string | null
+          name: string
+          owner_id: string
+          rating: number | null
+          rating_count: number | null
+          status: Database["public"]["Enums"]["asset_status"] | null
+          tags: string[] | null
+          ticker_symbol: string
+          total_revenue: number | null
+          updated_at: string
+        }
+        Insert: {
+          api_call_count?: number | null
+          asset_type: Database["public"]["Enums"]["asset_type"]
+          created_at?: string
+          current_price?: number | null
+          custom_license_terms?: string | null
+          description?: string | null
+          download_count?: number | null
+          file_path?: string | null
+          github_url?: string | null
+          id?: string
+          initial_price?: number | null
+          license_type: Database["public"]["Enums"]["license_type"]
+          model_url?: string | null
+          name: string
+          owner_id: string
+          rating?: number | null
+          rating_count?: number | null
+          status?: Database["public"]["Enums"]["asset_status"] | null
+          tags?: string[] | null
+          ticker_symbol: string
+          total_revenue?: number | null
+          updated_at?: string
+        }
+        Update: {
+          api_call_count?: number | null
+          asset_type?: Database["public"]["Enums"]["asset_type"]
+          created_at?: string
+          current_price?: number | null
+          custom_license_terms?: string | null
+          description?: string | null
+          download_count?: number | null
+          file_path?: string | null
+          github_url?: string | null
+          id?: string
+          initial_price?: number | null
+          license_type?: Database["public"]["Enums"]["license_type"]
+          model_url?: string | null
+          name?: string
+          owner_id?: string
+          rating?: number | null
+          rating_count?: number | null
+          status?: Database["public"]["Enums"]["asset_status"] | null
+          tags?: string[] | null
+          ticker_symbol?: string
+          total_revenue?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      asset_reviews: {
+        Row: {
+          asset_id: string
+          created_at: string
+          id: string
+          rating: number
+          review_text: string | null
+          reviewer_id: string
+        }
+        Insert: {
+          asset_id: string
+          created_at?: string
+          id?: string
+          rating: number
+          review_text?: string | null
+          reviewer_id: string
+        }
+        Update: {
+          asset_id?: string
+          created_at?: string
+          id?: string
+          rating?: number
+          review_text?: string | null
+          reviewer_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "asset_reviews_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "ai_assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      asset_transactions: {
+        Row: {
+          amount: number
+          asset_id: string
+          buyer_id: string | null
+          created_at: string
+          id: string
+          payment_method: string | null
+          royalty_amount: number
+          transaction_type: string
+        }
+        Insert: {
+          amount: number
+          asset_id: string
+          buyer_id?: string | null
+          created_at?: string
+          id?: string
+          payment_method?: string | null
+          royalty_amount: number
+          transaction_type: string
+        }
+        Update: {
+          amount?: number
+          asset_id?: string
+          buyer_id?: string | null
+          created_at?: string
+          id?: string
+          payment_method?: string | null
+          royalty_amount?: number
+          transaction_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "asset_transactions_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "ai_assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      price_history: {
+        Row: {
+          asset_id: string
+          id: string
+          price: number
+          timestamp: string
+          volume: number | null
+        }
+        Insert: {
+          asset_id: string
+          id?: string
+          price: number
+          timestamp?: string
+          volume?: number | null
+        }
+        Update: {
+          asset_id?: string
+          id?: string
+          price?: number
+          timestamp?: string
+          volume?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "price_history_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "ai_assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_profiles: {
+        Row: {
+          bio: string | null
+          company: string | null
+          created_at: string
+          full_name: string | null
+          github_username: string | null
+          id: string
+          total_earnings: number | null
+          updated_at: string
+          username: string | null
+          website: string | null
+        }
+        Insert: {
+          bio?: string | null
+          company?: string | null
+          created_at?: string
+          full_name?: string | null
+          github_username?: string | null
+          id: string
+          total_earnings?: number | null
+          updated_at?: string
+          username?: string | null
+          website?: string | null
+        }
+        Update: {
+          bio?: string | null
+          company?: string | null
+          created_at?: string
+          full_name?: string | null
+          github_username?: string | null
+          id?: string
+          total_earnings?: number | null
+          updated_at?: string
+          username?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_ticker_symbol: {
+        Args: { asset_name: string }
+        Returns: string
+      }
+      update_asset_price: {
+        Args: { asset_id_param: string }
+        Returns: number
+      }
     }
     Enums: {
-      [_ in never]: never
+      asset_status: "pending" | "approved" | "rejected" | "delisted"
+      asset_type:
+        | "model"
+        | "dataset"
+        | "api"
+        | "framework"
+        | "tool"
+        | "company_share"
+      license_type:
+        | "mit"
+        | "apache"
+        | "commercial"
+        | "proprietary"
+        | "cc0"
+        | "custom"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -133,6 +375,24 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      asset_status: ["pending", "approved", "rejected", "delisted"],
+      asset_type: [
+        "model",
+        "dataset",
+        "api",
+        "framework",
+        "tool",
+        "company_share",
+      ],
+      license_type: [
+        "mit",
+        "apache",
+        "commercial",
+        "proprietary",
+        "cc0",
+        "custom",
+      ],
+    },
   },
 } as const
