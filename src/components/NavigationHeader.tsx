@@ -1,9 +1,11 @@
 
 import { useState } from 'react';
-import { BarChart, Wallet, TrendingUp, Search, Bell, User } from 'lucide-react';
+import { BarChart, Wallet, TrendingUp, Search, Bell, User, LogOut, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
+import { useAuth } from '@/hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
 
 interface NavigationHeaderProps {
   activeTab: string;
@@ -12,6 +14,9 @@ interface NavigationHeaderProps {
 
 const NavigationHeader = ({ activeTab, setActiveTab }: NavigationHeaderProps) => {
   const [searchQuery, setSearchQuery] = useState('');
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   const tabs = [
     { id: 'market', label: 'Market', icon: BarChart },
@@ -19,13 +24,29 @@ const NavigationHeader = ({ activeTab, setActiveTab }: NavigationHeaderProps) =>
     { id: 'portfolio', label: 'Portfolio', icon: Wallet },
   ];
 
+  const handleSignOut = async () => {
+    const { error } = await signOut();
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to sign out",
+        variant: "destructive"
+      });
+    } else {
+      toast({
+        title: "Signed out",
+        description: "You've been signed out successfully"
+      });
+    }
+  };
+
   return (
     <header className="border-b border-slate-800/50 bg-slate-950/50 backdrop-blur-lg sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo and Navigation */}
           <div className="flex items-center gap-8">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
               <div className="w-8 h-8 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">NS</span>
               </div>
@@ -66,17 +87,41 @@ const NavigationHeader = ({ activeTab, setActiveTab }: NavigationHeaderProps) =>
               />
             </div>
             
-            <Button variant="ghost" size="icon" className="text-slate-300 hover:text-white">
-              <Bell className="w-5 h-5" />
-            </Button>
-            
-            <Button variant="ghost" size="icon" className="text-slate-300 hover:text-white">
-              <User className="w-5 h-5" />
-            </Button>
-            
-            <Button className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white">
-              Connect Wallet
-            </Button>
+            {user ? (
+              <>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="text-slate-300 hover:text-white"
+                  onClick={() => navigate('/upload')}
+                >
+                  <Upload className="w-5 h-5" />
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="text-slate-300 hover:text-white"
+                  onClick={() => navigate('/dashboard')}
+                >
+                  <User className="w-5 h-5" />
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="text-slate-300 hover:text-white"
+                  onClick={handleSignOut}
+                >
+                  <LogOut className="w-5 h-5" />
+                </Button>
+              </>
+            ) : (
+              <Button 
+                onClick={() => navigate('/auth')}
+                className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white"
+              >
+                Sign In
+              </Button>
+            )}
           </div>
         </div>
       </div>

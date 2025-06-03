@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TrendingUp, TrendingDown, BarChart, DollarSign, Zap, Database, Plus } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,11 +11,20 @@ import AssetCard from '@/components/AssetCard';
 import TradingPanel from '@/components/TradingPanel';
 import PortfolioDashboard from '@/components/PortfolioDashboard';
 import { useAssets } from '@/hooks/useAssets';
+import { useAuth } from '@/hooks/useAuth';
 
 const Index = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('market');
   const { data: assets, isLoading, error } = useAssets();
+  const { user, loading: authLoading } = useAuth();
+
+  // Redirect authenticated users from auth pages
+  useEffect(() => {
+    if (!authLoading && user) {
+      // User is logged in
+    }
+  }, [user, authLoading]);
 
   // Convert database assets to the format expected by AssetCard
   const formatAssetsForDisplay = (dbAssets: any[]) => {
@@ -23,11 +32,11 @@ const Index = () => {
       id: asset.id,
       name: asset.name,
       symbol: asset.ticker_symbol,
-      price: parseFloat(asset.current_price),
-      change: parseFloat(asset.current_price) - parseFloat(asset.initial_price),
-      changePercent: ((parseFloat(asset.current_price) - parseFloat(asset.initial_price)) / parseFloat(asset.initial_price)) * 100,
-      volume: `${asset.download_count}`,
-      marketCap: `${(parseFloat(asset.current_price) * (asset.download_count + 100)).toFixed(1)}M`,
+      price: parseFloat(asset.current_price || '0'),
+      change: parseFloat(asset.current_price || '0') - parseFloat(asset.initial_price || '0'),
+      changePercent: ((parseFloat(asset.current_price || '0') - parseFloat(asset.initial_price || '0')) / parseFloat(asset.initial_price || '1')) * 100,
+      volume: `${asset.download_count || 0}`,
+      marketCap: `${(parseFloat(asset.current_price || '0') * ((asset.download_count || 0) + 100)).toFixed(1)}M`,
       category: asset.asset_type.charAt(0).toUpperCase() + asset.asset_type.slice(1),
       description: asset.description,
       logo: getAssetLogo(asset.asset_type)
@@ -55,13 +64,15 @@ const Index = () => {
             
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold text-white">Featured AI Assets</h2>
-              <Button 
-                onClick={() => navigate('/upload')}
-                className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2"
-              >
-                <Plus className="w-4 h-4" />
-                List Your Asset
-              </Button>
+              {user && (
+                <Button 
+                  onClick={() => navigate('/upload')}
+                  className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  List Your Asset
+                </Button>
+              )}
             </div>
 
             {isLoading ? (
@@ -104,13 +115,22 @@ const Index = () => {
                   <p className="text-slate-400 mb-6">
                     Be the first to list your AI assets on the NeuroStock exchange!
                   </p>
-                  <Button 
-                    onClick={() => navigate('/upload')}
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Upload First Asset
-                  </Button>
+                  {user ? (
+                    <Button 
+                      onClick={() => navigate('/upload')}
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Upload First Asset
+                    </Button>
+                  ) : (
+                    <Button 
+                      onClick={() => navigate('/auth')}
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      Sign In to Upload
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             )}

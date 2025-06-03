@@ -66,7 +66,7 @@ export const useUserAssets = () => {
 
       return data as Asset[];
     },
-    enabled: false, // Only fetch when user is authenticated
+    enabled: false,
   });
 };
 
