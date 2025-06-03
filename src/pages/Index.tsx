@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TrendingUp, TrendingDown, BarChart, DollarSign, Zap, Database, Plus, Brain, Rocket, Star } from 'lucide-react';
@@ -11,6 +12,7 @@ import TradingPanel from '@/components/TradingPanel';
 import PortfolioDashboard from '@/components/PortfolioDashboard';
 import AIMarketInsights from '@/components/AIMarketInsights';
 import NewsTickerFeed from '@/components/NewsTickerFeed';
+import StockScreener from '@/components/StockScreener';
 import { useAssets } from '@/hooks/useAssets';
 import { useAuth } from '@/hooks/useAuth';
 
