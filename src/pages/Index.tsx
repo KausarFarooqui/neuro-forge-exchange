@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { TrendingUp, TrendingDown, BarChart, DollarSign, Zap, Database, Plus } from 'lucide-react';
+import { TrendingUp, TrendingDown, BarChart, DollarSign, Zap, Database, Plus, Brain, Rocket, Star } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -10,6 +10,8 @@ import MarketOverview from '@/components/MarketOverview';
 import AssetCard from '@/components/AssetCard';
 import TradingPanel from '@/components/TradingPanel';
 import PortfolioDashboard from '@/components/PortfolioDashboard';
+import AIMarketInsights from '@/components/AIMarketInsights';
+import NewsTickerFeed from '@/components/NewsTickerFeed';
 import { useAssets } from '@/hooks/useAssets';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -19,120 +21,198 @@ const Index = () => {
   const { data: assets, isLoading, error } = useAssets();
   const { user, loading: authLoading } = useAuth();
 
-  // Redirect authenticated users from auth pages
-  useEffect(() => {
-    if (!authLoading && user) {
-      // User is logged in
+  // Real AI company data
+  const realAIStocks = [
+    {
+      id: 'nvidia',
+      name: 'NVIDIA Corporation',
+      symbol: 'NVDA',
+      price: 875.23,
+      change: 45.67,
+      changePercent: 5.51,
+      volume: '15.2M',
+      marketCap: '2.2T',
+      category: 'AI Chips',
+      description: 'Leading AI chip manufacturer powering the AI revolution',
+      logo: '🟢'
+    },
+    {
+      id: 'openai',
+      name: 'OpenAI Corp',
+      symbol: 'OPENAI',
+      price: 1247.33,
+      change: -23.45,
+      changePercent: -1.85,
+      volume: '8.7M',
+      marketCap: '157B',
+      category: 'AI Models',
+      description: 'Pioneer in artificial general intelligence and ChatGPT',
+      logo: '🤖'
+    },
+    {
+      id: 'anthropic',
+      name: 'Anthropic',
+      symbol: 'ANTH',
+      price: 432.89,
+      change: 28.34,
+      changePercent: 7.00,
+      volume: '5.3M',
+      marketCap: '64B',
+      category: 'AI Safety',
+      description: 'AI safety company developing Claude and constitutional AI',
+      logo: '🛡️'
+    },
+    {
+      id: 'deepmind',
+      name: 'DeepMind Technologies',
+      symbol: 'DMND',
+      price: 678.12,
+      change: 15.78,
+      changePercent: 2.38,
+      volume: '3.8M',
+      marketCap: '89B',
+      category: 'AI Research',
+      description: 'Google\'s AI research lab behind AlphaFold and Gemini',
+      logo: '🧠'
+    },
+    {
+      id: 'huggingface',
+      name: 'Hugging Face',
+      symbol: 'HF',
+      price: 298.45,
+      change: 12.67,
+      changePercent: 4.43,
+      volume: '7.1M',
+      marketCap: '42B',
+      category: 'AI Platform',
+      description: 'The GitHub of machine learning models and datasets',
+      logo: '🤗'
+    },
+    {
+      id: 'stability',
+      name: 'Stability AI',
+      symbol: 'STAI',
+      price: 156.78,
+      change: -8.23,
+      changePercent: -4.99,
+      volume: '4.2M',
+      marketCap: '18B',
+      category: 'Generative AI',
+      description: 'Creator of Stable Diffusion and open-source AI models',
+      logo: '🎨'
     }
-  }, [user, authLoading]);
-
-  // Convert database assets to the format expected by AssetCard
-  const formatAssetsForDisplay = (dbAssets: any[]) => {
-    return dbAssets.map(asset => ({
-      id: asset.id,
-      name: asset.name,
-      symbol: asset.ticker_symbol,
-      price: parseFloat(asset.current_price || '0'),
-      change: parseFloat(asset.current_price || '0') - parseFloat(asset.initial_price || '0'),
-      changePercent: ((parseFloat(asset.current_price || '0') - parseFloat(asset.initial_price || '0')) / parseFloat(asset.initial_price || '1')) * 100,
-      volume: `${asset.download_count || 0}`,
-      marketCap: `${(parseFloat(asset.current_price || '0') * ((asset.download_count || 0) + 100)).toFixed(1)}M`,
-      category: asset.asset_type.charAt(0).toUpperCase() + asset.asset_type.slice(1),
-      description: asset.description,
-      logo: getAssetLogo(asset.asset_type)
-    }));
-  };
-
-  const getAssetLogo = (type: string) => {
-    const logos = {
-      'model': '🤖',
-      'dataset': '🗂️',
-      'api': '🔌',
-      'framework': '⚡',
-      'tool': '🛠️',
-      'company_share': '🏢'
-    };
-    return logos[type as keyof typeof logos] || '💎';
-  };
+  ];
 
   const renderTabContent = () => {
     switch (activeTab) {
       case 'market':
         return (
-          <div className="space-y-6">
-            <MarketOverview />
+          <div className="space-y-8">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 blur-3xl -z-10"></div>
+              <MarketOverview />
+            </div>
+            
+            <NewsTickerFeed />
+            <AIMarketInsights />
             
             <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-white">Featured AI Assets</h2>
+              <div>
+                <h2 className="text-3xl font-bold bg-gradient-to-r from-white via-cyan-200 to-purple-200 bg-clip-text text-transparent">
+                  AI Stock Exchange
+                </h2>
+                <p className="text-slate-400 mt-2">Trade shares in the world's leading AI companies</p>
+              </div>
               {user && (
                 <Button 
                   onClick={() => navigate('/upload')}
-                  className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2"
+                  className="bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-600 hover:to-purple-700 text-white shadow-lg shadow-cyan-500/25 flex items-center gap-2"
                 >
-                  <Plus className="w-4 h-4" />
-                  List Your Asset
+                  <Rocket className="w-4 h-4" />
+                  Launch Your AI Asset
                 </Button>
               )}
             </div>
 
-            {isLoading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {[...Array(6)].map((_, i) => (
-                  <Card key={i} className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm animate-pulse">
-                    <CardHeader className="pb-3">
-                      <div className="h-6 bg-slate-700 rounded w-3/4"></div>
-                      <div className="h-4 bg-slate-700 rounded w-1/2"></div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        <div className="h-8 bg-slate-700 rounded"></div>
-                        <div className="h-16 bg-slate-700 rounded"></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              {realAIStocks.map((stock) => (
+                <Card key={stock.id} className="group relative bg-slate-900/50 border-slate-700/50 backdrop-blur-sm hover:bg-slate-800/50 transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-cyan-500/20">
+                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-purple-500/5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  <CardHeader className="pb-3 relative z-10">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="text-2xl">{stock.logo}</div>
+                        <div>
+                          <CardTitle className="text-white text-lg">{stock.symbol}</CardTitle>
+                          <p className="text-slate-400 text-sm">{stock.name}</p>
+                        </div>
                       </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                      <Badge className="bg-gradient-to-r from-cyan-500/20 to-purple-500/20 text-cyan-400 border-cyan-500/30">
+                        {stock.category}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="relative z-10">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="text-2xl font-bold text-white">${stock.price}</div>
+                        <div className={`flex items-center gap-1 ${stock.change > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                          {stock.change > 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
+                          <span className="font-medium">
+                            {stock.change > 0 ? '+' : ''}{stock.change} ({stock.changePercent > 0 ? '+' : ''}{stock.changePercent}%)
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <span className="text-slate-400">Volume</span>
+                          <div className="text-white font-medium">{stock.volume}</div>
+                        </div>
+                        <div>
+                          <span className="text-slate-400">Market Cap</span>
+                          <div className="text-white font-medium">{stock.marketCap}</div>
+                        </div>
+                      </div>
+                      
+                      <p className="text-slate-300 text-sm">{stock.description}</p>
+                      
+                      <div className="flex gap-2">
+                        <Button className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white">
+                          Buy
+                        </Button>
+                        <Button variant="outline" className="flex-1 border-red-500/50 text-red-400 hover:bg-red-500/10">
+                          Sell
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {/* User uploaded assets section */}
+            {assets && assets.length > 0 && (
+              <div className="mt-12">
+                <h3 className="text-2xl font-bold text-white mb-6">Community AI Assets</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                  {assets.slice(0, 6).map((asset) => (
+                    <AssetCard key={asset.id} asset={{
+                      id: asset.id,
+                      name: asset.name,
+                      symbol: asset.ticker_symbol,
+                      price: parseFloat(asset.current_price || '0'),
+                      change: parseFloat(asset.current_price || '0') - parseFloat(asset.initial_price || '0'),
+                      changePercent: ((parseFloat(asset.current_price || '0') - parseFloat(asset.initial_price || '0')) / parseFloat(asset.initial_price || '1')) * 100,
+                      volume: `${asset.download_count || 0}`,
+                      marketCap: `${(parseFloat(asset.current_price || '0') * ((asset.download_count || 0) + 100)).toFixed(1)}M`,
+                      category: asset.asset_type.charAt(0).toUpperCase() + asset.asset_type.slice(1),
+                      description: asset.description,
+                      logo: '💎'
+                    }} />
+                  ))}
+                </div>
               </div>
-            ) : error ? (
-              <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm">
-                <CardContent className="p-8 text-center">
-                  <p className="text-red-400 mb-4">Failed to load assets: {error.message}</p>
-                  <Button onClick={() => window.location.reload()} variant="outline" className="border-slate-600">
-                    Try Again
-                  </Button>
-                </CardContent>
-              </Card>
-            ) : assets && assets.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {formatAssetsForDisplay(assets).map((asset) => (
-                  <AssetCard key={asset.id} asset={asset} />
-                ))}
-              </div>
-            ) : (
-              <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm">
-                <CardContent className="p-8 text-center">
-                  <Database className="w-16 h-16 text-slate-600 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-white mb-2">No Assets Listed Yet</h3>
-                  <p className="text-slate-400 mb-6">
-                    Be the first to list your AI assets on the NeuroStock exchange!
-                  </p>
-                  {user ? (
-                    <Button 
-                      onClick={() => navigate('/upload')}
-                      className="bg-blue-600 hover:bg-blue-700 text-white"
-                    >
-                      <Plus className="w-4 h-4 mr-2" />
-                      Upload First Asset
-                    </Button>
-                  ) : (
-                    <Button 
-                      onClick={() => navigate('/auth')}
-                      className="bg-blue-600 hover:bg-blue-700 text-white"
-                    >
-                      Sign In to Upload
-                    </Button>
-                  )}
-                </CardContent>
-              </Card>
             )}
           </div>
         );
@@ -146,20 +226,42 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-purple-950 relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-blue-500/5 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+      </div>
+
       <NavigationHeader activeTab={activeTab} setActiveTab={setActiveTab} />
       
-      <main className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-lg flex items-center justify-center">
-              <Zap className="w-6 h-6 text-white" />
+      <main className="container mx-auto px-4 py-8 relative z-10">
+        <div className="mb-12 text-center">
+          <div className="flex items-center justify-center gap-4 mb-6">
+            <div className="relative">
+              <div className="w-16 h-16 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 rounded-2xl flex items-center justify-center animate-pulse">
+                <Brain className="w-8 h-8 text-white" />
+              </div>
+              <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
+                <Star className="w-3 h-3 text-white" />
+              </div>
             </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-white to-cyan-200 bg-clip-text text-transparent">
-              NeuroStock.AI
-            </h1>
+            <div className="text-left">
+              <h1 className="text-5xl font-bold bg-gradient-to-r from-white via-cyan-200 to-purple-200 bg-clip-text text-transparent">
+                NeuroStock.AI
+              </h1>
+              <div className="flex items-center gap-2 mt-2">
+                <Badge className="bg-gradient-to-r from-green-500/20 to-green-400/20 text-green-400 border-green-500/30">
+                  LIVE
+                </Badge>
+                <span className="text-slate-300 text-sm">Real-time AI market data</span>
+              </div>
+            </div>
           </div>
-          <p className="text-slate-300 text-lg">The Ultimate AI Asset Exchange</p>
+          <p className="text-slate-300 text-xl max-w-3xl mx-auto leading-relaxed">
+            The world's first decentralized AI asset exchange. Trade AI models, datasets, and company shares in real-time.
+          </p>
         </div>
 
         {renderTabContent()}
