@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
 interface Asset {
-  id: number;
+  id: string; // Changed from number to string to handle UUIDs
   name: string;
   symbol: string;
   price: number;
