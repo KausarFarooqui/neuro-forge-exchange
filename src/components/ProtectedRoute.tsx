@@ -2,7 +2,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { LoadingSkeleton } from '@/components/Dashboard/LoadingSkeleton';
+import LoadingSkeleton from '@/components/Dashboard/LoadingSkeleton';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
