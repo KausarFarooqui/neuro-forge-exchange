@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TrendingUp, TrendingDown, BarChart, DollarSign, Zap, Database, Plus, Brain, Rocket, Star } from 'lucide-react';
@@ -196,21 +195,27 @@ const Index = () => {
               <div className="mt-12">
                 <h3 className="text-2xl font-bold text-white mb-6">Community AI Assets</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                  {assets.slice(0, 6).map((asset) => (
-                    <AssetCard key={asset.id} asset={{
-                      id: asset.id,
-                      name: asset.name,
-                      symbol: asset.ticker_symbol,
-                      price: parseFloat(asset.current_price || '0'),
-                      change: parseFloat(asset.current_price || '0') - parseFloat(asset.initial_price || '0'),
-                      changePercent: ((parseFloat(asset.current_price || '0') - parseFloat(asset.initial_price || '0')) / parseFloat(asset.initial_price || '1')) * 100,
-                      volume: `${asset.download_count || 0}`,
-                      marketCap: `${(parseFloat(asset.current_price || '0') * ((asset.download_count || 0) + 100)).toFixed(1)}M`,
-                      category: asset.asset_type.charAt(0).toUpperCase() + asset.asset_type.slice(1),
-                      description: asset.description,
-                      logo: '💎'
-                    }} />
-                  ))}
+                  {assets.slice(0, 6).map((asset) => {
+                    const currentPrice = Number(asset.current_price) || 0;
+                    const initialPrice = Number(asset.initial_price) || 1;
+                    const downloadCount = asset.download_count || 0;
+                    
+                    return (
+                      <AssetCard key={asset.id} asset={{
+                        id: asset.id,
+                        name: asset.name,
+                        symbol: asset.ticker_symbol,
+                        price: currentPrice,
+                        change: currentPrice - initialPrice,
+                        changePercent: ((currentPrice - initialPrice) / initialPrice) * 100,
+                        volume: downloadCount.toString(),
+                        marketCap: `${((currentPrice * (downloadCount + 100)) / 1000000).toFixed(1)}M`,
+                        category: asset.asset_type.charAt(0).toUpperCase() + asset.asset_type.slice(1),
+                        description: asset.description,
+                        logo: '💎'
+                      }} />
+                    );
+                  })}
                 </div>
               </div>
             )}
