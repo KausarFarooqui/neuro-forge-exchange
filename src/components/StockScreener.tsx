@@ -223,9 +223,9 @@ const StockScreener = () => {
                   <SelectValue placeholder="Any" />
                 </SelectTrigger>
                 <SelectContent className="bg-slate-800 border-slate-600">
-                  <SelectItem value="large">Large Cap (>$10B)</SelectItem>
+                  <SelectItem value="large">Large Cap (&gt;$10B)</SelectItem>
                   <SelectItem value="mid">Mid Cap ($2B-$10B)</SelectItem>
-                  <SelectItem value="small">Small Cap (<$2B)</SelectItem>
+                  <SelectItem value="small">Small Cap (&lt;$2B)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -237,9 +237,9 @@ const StockScreener = () => {
                   <SelectValue placeholder="Any" />
                 </SelectTrigger>
                 <SelectContent className="bg-slate-800 border-slate-600">
-                  <SelectItem value="low">Low (<20)</SelectItem>
+                  <SelectItem value="low">Low (&lt;20)</SelectItem>
                   <SelectItem value="medium">Medium (20-50)</SelectItem>
-                  <SelectItem value="high">High (>50)</SelectItem>
+                  <SelectItem value="high">High (&gt;50)</SelectItem>
                 </SelectContent>
               </Select>
             </div>

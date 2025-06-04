@@ -237,7 +237,7 @@ export type Database = {
     }
     Functions: {
       generate_ticker_symbol: {
-        Args: { asset_name: string }
+        Args: Record<PropertyKey, never> | { asset_name: string }
         Returns: string
       }
       update_asset_price: {
