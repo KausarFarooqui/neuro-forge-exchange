@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell } from 'recharts';
 
 interface DepthEntry {
   price: number;
@@ -50,11 +50,14 @@ const MarketDepth = ({ symbol, depthData, spread, spreadPercent }: MarketDepthPr
                 fontSize={10}
                 tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`}
               />
-              <Bar
-                dataKey="quantity"
-                fill={(entry) => entry.side === 'bid' ? '#10b981' : '#ef4444'}
-                opacity={0.8}
-              />
+              <Bar dataKey="quantity" opacity={0.8}>
+                {depthData.map((entry, index) => (
+                  <Cell 
+                    key={`cell-${index}`} 
+                    fill={entry.side === 'bid' ? '#10b981' : '#ef4444'} 
+                  />
+                ))}
+              </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>

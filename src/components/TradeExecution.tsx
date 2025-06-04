@@ -81,6 +81,14 @@ const TradeExecution = ({ symbol, currentPrice, availableBalance, onTrade }: Tra
     setStopPrice('');
   };
 
+  const handleOrderTypeChange = (value: string) => {
+    setOrderType(value as 'market' | 'limit' | 'stop');
+  };
+
+  const handleTimeInForceChange = (value: string) => {
+    setTimeInForce(value as 'GTC' | 'IOC' | 'FOK');
+  };
+
   return (
     <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm">
       <CardHeader>
@@ -106,7 +114,7 @@ const TradeExecution = ({ symbol, currentPrice, availableBalance, onTrade }: Tra
             {/* Order Type */}
             <div>
               <Label className="text-slate-300">Order Type</Label>
-              <Select value={orderType} onValueChange={setOrderType}>
+              <Select value={orderType} onValueChange={handleOrderTypeChange}>
                 <SelectTrigger className="bg-slate-800 border-slate-600 text-white">
                   <SelectValue />
                 </SelectTrigger>
@@ -163,7 +171,7 @@ const TradeExecution = ({ symbol, currentPrice, availableBalance, onTrade }: Tra
             {/* Time in Force */}
             <div>
               <Label className="text-slate-300">Time in Force</Label>
-              <Select value={timeInForce} onValueChange={setTimeInForce}>
+              <Select value={timeInForce} onValueChange={handleTimeInForceChange}>
                 <SelectTrigger className="bg-slate-800 border-slate-600 text-white">
                   <SelectValue />
                 </SelectTrigger>
