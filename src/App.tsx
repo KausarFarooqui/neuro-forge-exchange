@@ -1,6 +1,7 @@
+
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from "@/components/ui/toaster"
-import { QueryClient } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import Index from '@/pages/Index';
 import Auth from '@/pages/Auth';
@@ -9,9 +10,12 @@ import NotFound from '@/pages/NotFound';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import NeuralInsightsDashboard from '@/pages/NeuralInsightsDashboard';
 
+// Create a client
+const queryClient = new QueryClient();
+
 function App() {
   return (
-    <QueryClient>
+    <QueryClientProvider client={queryClient}>
       <div className="min-h-screen bg-background">
         <Toaster />
         <BrowserRouter>
@@ -31,7 +35,7 @@ function App() {
           </Routes>
         </BrowserRouter>
       </div>
-    </QueryClient>
+    </QueryClientProvider>
   );
 }
 
