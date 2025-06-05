@@ -1,33 +1,38 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Toaster } from "@/components/ui/toaster"
+import { QueryClient } from '@tanstack/react-query';
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
-import Auth from "./pages/Auth";
-import AssetUploadForm from "./components/AssetUploadForm";
-import TradingDashboard from "./pages/TradingDashboard";
-import NotFound from "./pages/NotFound";
+import Index from '@/pages/Index';
+import Auth from '@/pages/Auth';
+import TradingDashboard from '@/pages/TradingDashboard';
+import NotFound from '@/pages/NotFound';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import NeuralInsightsDashboard from '@/pages/NeuralInsightsDashboard';
 
-const queryClient = new QueryClient();
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/upload" element={<AssetUploadForm />} />
-          <Route path="/trading/:symbol?" element={<TradingDashboard />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+function App() {
+  return (
+    <QueryClient>
+      <div className="min-h-screen bg-background">
+        <Toaster />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/neural-insights" element={<NeuralInsightsDashboard />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route
+              path="/trading"
+              element={
+                <ProtectedRoute>
+                  <TradingDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </div>
+    </QueryClient>
+  );
+}
 
 export default App;

@@ -1,9 +1,9 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Brain, Globe, Zap, TrendingUp, Clock, ExternalLink, Sparkles } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface NewsItem {
   id: string;
@@ -19,6 +19,7 @@ interface NewsItem {
 }
 
 const AINewsHub = () => {
+  const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState('all');
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -148,6 +149,10 @@ const AINewsHub = () => {
       case 'negative': return 'text-red-400';
       default: return 'text-blue-400';
     }
+  };
+
+  const handleViewAllInsights = () => {
+    navigate('/neural-insights');
   };
 
   if (isLoading) {
@@ -288,7 +293,10 @@ const AINewsHub = () => {
 
         {/* View More Button */}
         <div className="text-center mt-6">
-          <Button className="bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-600 hover:to-purple-700 text-white">
+          <Button 
+            onClick={handleViewAllInsights}
+            className="bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-600 hover:to-purple-700 text-white transition-all duration-300 transform hover:scale-105"
+          >
             <TrendingUp className="w-4 h-4 mr-2" />
             View All Neural Insights
           </Button>
