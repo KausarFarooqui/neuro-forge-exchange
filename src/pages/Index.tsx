@@ -9,6 +9,9 @@ import NewsTickerFeed from '@/components/NewsTickerFeed';
 import HeroSection from '@/components/HeroSection';
 import AICompaniesGrid from '@/components/AICompaniesGrid';
 import CommunityAssets from '@/components/CommunityAssets';
+import AINewsHub from '@/components/AINewsHub';
+import TechWorldPulse from '@/components/TechWorldPulse';
+import MarketSentimentRadar from '@/components/MarketSentimentRadar';
 import { useAssets } from '@/hooks/useAssets';
 import { useAuth } from '@/hooks/useAuth';
 import { stockMarketService } from '@/services/stockMarketService';
@@ -18,7 +21,6 @@ const Index = () => {
   const { data: assets, isLoading, error } = useAssets();
   const { user, loading: authLoading } = useAuth();
   const [realStocks, setRealStocks] = useState(() => {
-    // Initialize with proper default values
     return stockMarketService.getAllStocks().map(stock => ({
       ...stock,
       change: stock.change || 0,
@@ -129,6 +131,18 @@ const Index = () => {
             </div>
             
             <NewsTickerFeed />
+            
+            {/* New AI/ML News and Analytics Section */}
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+              <div className="xl:col-span-2">
+                <AINewsHub />
+              </div>
+              <div className="space-y-6">
+                <TechWorldPulse />
+                <MarketSentimentRadar />
+              </div>
+            </div>
+            
             <AIMarketInsights />
             
             <HeroSection />
