@@ -1,10 +1,9 @@
 
-
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-import Index from '@/pages/Index';
+import EnhancedIndex from '@/pages/EnhancedIndex';
 import Auth from '@/pages/Auth';
 import TradingDashboard from '@/pages/TradingDashboard';
 import NotFound from '@/pages/NotFound';
@@ -13,7 +12,14 @@ import NeuralInsightsDashboard from '@/pages/NeuralInsightsDashboard';
 import AssetUploadForm from '@/components/AssetUploadForm';
 
 // Create a client
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 function App() {
   return (
@@ -22,7 +28,7 @@ function App() {
         <Toaster />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Index />} />
+            <Route path="/" element={<EnhancedIndex />} />
             <Route path="/neural-insights" element={<NeuralInsightsDashboard />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/upload" element={
