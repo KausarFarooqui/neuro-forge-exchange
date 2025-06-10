@@ -148,7 +148,7 @@ const NavigationHeader = ({ activeTab, setActiveTab }: NavigationHeaderProps) =>
                   variant="ghost" 
                   size="icon" 
                   className="text-slate-300 hover:text-white hover:bg-gradient-to-r hover:from-blue-500/20 hover:to-blue-600/20 transition-all duration-300"
-                  onClick={() => navigate('/dashboard')}
+                  onClick={() => navigate('/profile')}
                 >
                   <User className="w-5 h-5" />
                 </Button>
@@ -164,7 +164,7 @@ const NavigationHeader = ({ activeTab, setActiveTab }: NavigationHeaderProps) =>
               </div>
             ) : (
               <Button 
-                onClick={() => navigate('/auth')}
+                onClick={() => navigate('/enhanced-auth')}
                 className="bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-600 hover:to-purple-700 text-white shadow-lg shadow-cyan-500/25 px-6 py-2 rounded-lg font-medium transition-all duration-300 hover:scale-105"
               >
                 Enter the Matrix

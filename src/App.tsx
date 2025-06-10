@@ -5,6 +5,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import EnhancedIndex from '@/pages/EnhancedIndex';
 import Auth from '@/pages/Auth';
+import EnhancedAuth from '@/pages/EnhancedAuth';
+import Profile from '@/pages/Profile';
 import TradingDashboard from '@/pages/TradingDashboard';
 import NotFound from '@/pages/NotFound';
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -31,6 +33,12 @@ function App() {
             <Route path="/" element={<EnhancedIndex />} />
             <Route path="/neural-insights" element={<NeuralInsightsDashboard />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/enhanced-auth" element={<EnhancedAuth />} />
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            } />
             <Route path="/upload" element={
               <ProtectedRoute>
                 <AssetUploadForm />
