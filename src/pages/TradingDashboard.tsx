@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import NavigationHeader from '@/components/NavigationHeader';
@@ -7,9 +6,13 @@ import OrderBook from '@/components/OrderBook';
 import TradeExecution from '@/components/TradeExecution';
 import PositionsManager from '@/components/PositionsManager';
 import MarketDepth from '@/components/MarketDepth';
+import TradingHeader from '@/components/Trading/TradingHeader';
+import MarketWatchlist from '@/components/Trading/MarketWatchlist';
+import QuickTradePanel from '@/components/Trading/QuickTradePanel';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useStockData } from '@/hooks/useStockData';
+import { useRealTimeTrading } from '@/hooks/useRealTimeTrading';
 import { useToast } from '@/hooks/use-toast';
 import { TrendingUp, TrendingDown, Volume2, DollarSign } from 'lucide-react';
 
@@ -40,7 +43,17 @@ interface Position {
 const TradingDashboard = () => {
   const { symbol = 'NVDA' } = useParams();
   const { stockData, chartData, orderBook, loading } = useStockData(symbol);
+  const { 
+    prices, 
+    portfolio, 
+    notifications, 
+    isConnected, 
+    executeTrade, 
+    getPrice,
+    clearNotifications 
+  } = useRealTimeTrading();
   const { toast } = useToast();
+  const [selectedSymbol, setSelectedSymbol] = useState(symbol);
   const [availableBalance] = useState(50000); // Mock balance
   const [positions, setPositions] = useState<Position[]>([
     {
@@ -71,46 +84,14 @@ const TradingDashboard = () => {
     }
   ]);
 
-  const handleTrade = (trade: TradeOrder) => {
+  // Update selected symbol when URL changes
+  useEffect(() => {
+    setSelectedSymbol(symbol);
+  }, [symbol]);
+
+  const handleTrade = async (trade: any) => {
     console.log('Executing trade:', trade);
-    
-    // Mock trade execution
-    if (trade.type === 'buy') {
-      const existingPosition = positions.find(p => p.symbol === trade.symbol);
-      if (existingPosition) {
-        // Update existing position
-        const newQuantity = existingPosition.quantity + trade.quantity;
-        const newAvgPrice = ((existingPosition.avgPrice * existingPosition.quantity) + 
-                           ((trade.price || stockData?.price || 0) * trade.quantity)) / newQuantity;
-        
-        setPositions(prev => prev.map(p => 
-          p.symbol === trade.symbol 
-            ? { 
-                ...p, 
-                quantity: newQuantity, 
-                avgPrice: newAvgPrice,
-                marketValue: newQuantity * (stockData?.price || 0)
-              }
-            : p
-        ));
-      } else {
-        // Create new position
-        const newPosition: Position = {
-          id: Date.now().toString(),
-          symbol: trade.symbol,
-          name: stockData?.name || trade.symbol,
-          quantity: trade.quantity,
-          avgPrice: trade.price || stockData?.price || 0,
-          currentPrice: stockData?.price || 0,
-          marketValue: trade.quantity * (stockData?.price || 0),
-          unrealizedPnL: 0,
-          unrealizedPnLPercent: 0,
-          dayChange: 0,
-          dayChangePercent: 0
-        };
-        setPositions(prev => [...prev, newPosition]);
-      }
-    }
+    return await executeTrade(trade);
   };
 
   const handleClosePosition = (positionId: string) => {
@@ -133,6 +114,11 @@ const TradingDashboard = () => {
       </div>
     );
   }
+
+  const currentPrice = getPrice(selectedSymbol);
+  const displayPrice = currentPrice?.price || stockData.price;
+  const displayChange = currentPrice?.change || stockData.change;
+  const displayChangePercent = currentPrice?.changePercent || stockData.changePercent;
 
   const depthData = [
     ...orderBook.bids.map(bid => ({
@@ -157,89 +143,103 @@ const TradingDashboard = () => {
       <NavigationHeader activeTab="trading" setActiveTab={() => {}} />
       
       <main className="container mx-auto px-4 py-8">
-        {/* Stock Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-4 mb-4">
-            <h1 className="text-4xl font-bold text-white">{stockData.symbol}</h1>
-            <Badge className="bg-gradient-to-r from-cyan-500/20 to-purple-500/20 text-cyan-400 border-cyan-500/30">
-              LIVE
-            </Badge>
-          </div>
-          <p className="text-xl text-slate-300">{stockData.name}</p>
-          
-          {/* Key Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-            <Card className="bg-slate-900/50 border-slate-700/50">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <DollarSign className="w-4 h-4 text-cyan-400" />
-                  <span className="text-slate-400 text-sm">Market Cap</span>
-                </div>
-                <div className="text-white font-bold">${(stockData.marketCap / 1e12).toFixed(2)}T</div>
-              </CardContent>
-            </Card>
-            <Card className="bg-slate-900/50 border-slate-700/50">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <Volume2 className="w-4 h-4 text-cyan-400" />
-                  <span className="text-slate-400 text-sm">Volume</span>
-                </div>
-                <div className="text-white font-bold">{(stockData.volume / 1e6).toFixed(1)}M</div>
-              </CardContent>
-            </Card>
-            <Card className="bg-slate-900/50 border-slate-700/50">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <TrendingUp className="w-4 h-4 text-cyan-400" />
-                  <span className="text-slate-400 text-sm">P/E Ratio</span>
-                </div>
-                <div className="text-white font-bold">{stockData.pe}</div>
-              </CardContent>
-            </Card>
-            <Card className="bg-slate-900/50 border-slate-700/50">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <TrendingDown className="w-4 h-4 text-cyan-400" />
-                  <span className="text-slate-400 text-sm">Beta</span>
-                </div>
-                <div className="text-white font-bold">{stockData.beta}</div>
-              </CardContent>
-            </Card>
-          </div>
+        <TradingHeader
+          symbol={selectedSymbol}
+          price={displayPrice}
+          change={displayChange}
+          changePercent={displayChangePercent}
+          isConnected={isConnected}
+          notifications={notifications}
+          onClearNotifications={clearNotifications}
+        />
+
+        {/* Key Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <Card className="bg-slate-900/50 border-slate-700/50">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <DollarSign className="w-4 h-4 text-cyan-400" />
+                <span className="text-slate-400 text-sm">Market Cap</span>
+              </div>
+              <div className="text-white font-bold">${(stockData.marketCap / 1e12).toFixed(2)}T</div>
+            </CardContent>
+          </Card>
+          <Card className="bg-slate-900/50 border-slate-700/50">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Volume2 className="w-4 h-4 text-cyan-400" />
+                <span className="text-slate-400 text-sm">Volume</span>
+              </div>
+              <div className="text-white font-bold">{(stockData.volume / 1e6).toFixed(1)}M</div>
+            </CardContent>
+          </Card>
+          <Card className="bg-slate-900/50 border-slate-700/50">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <TrendingUp className="w-4 h-4 text-cyan-400" />
+                <span className="text-slate-400 text-sm">P/E Ratio</span>
+              </div>
+              <div className="text-white font-bold">{stockData.pe}</div>
+            </CardContent>
+          </Card>
+          <Card className="bg-slate-900/50 border-slate-700/50">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <TrendingDown className="w-4 h-4 text-cyan-400" />
+                <span className="text-slate-400 text-sm">Beta</span>
+              </div>
+              <div className="text-white font-bold">{stockData.beta}</div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Main Trading Interface */}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
           {/* Left Column - Chart and Market Depth */}
           <div className="xl:col-span-2 space-y-6">
             <StockChart
-              symbol={stockData.symbol}
+              symbol={selectedSymbol}
               data={chartData}
-              currentPrice={stockData.price}
-              change={stockData.change}
-              changePercent={stockData.changePercent}
+              currentPrice={displayPrice}
+              change={displayChange}
+              changePercent={displayChangePercent}
             />
             <MarketDepth
-              symbol={stockData.symbol}
+              symbol={selectedSymbol}
               depthData={depthData}
               spread={spread}
               spreadPercent={spreadPercent}
             />
           </div>
 
-          {/* Right Column - Trading and Order Book */}
+          {/* Middle Column - Trading Controls */}
           <div className="space-y-6">
-            <TradeExecution
-              symbol={stockData.symbol}
-              currentPrice={stockData.price}
-              availableBalance={availableBalance}
+            <QuickTradePanel
+              symbol={selectedSymbol}
+              currentPrice={displayPrice}
+              availableBalance={portfolio.cashBalance}
               onTrade={handleTrade}
             />
+            <TradeExecution
+              symbol={selectedSymbol}
+              currentPrice={displayPrice}
+              availableBalance={portfolio.cashBalance}
+              onTrade={handleTrade}
+            />
+          </div>
+
+          {/* Right Column - Market Data and Order Book */}
+          <div className="space-y-6">
+            <MarketWatchlist
+              marketData={prices}
+              selectedSymbol={selectedSymbol}
+              onSymbolSelect={setSelectedSymbol}
+            />
             <OrderBook
-              symbol={stockData.symbol}
+              symbol={selectedSymbol}
               bids={orderBook.bids}
               asks={orderBook.asks}
-              lastPrice={stockData.price}
+              lastPrice={displayPrice}
             />
           </div>
         </div>
