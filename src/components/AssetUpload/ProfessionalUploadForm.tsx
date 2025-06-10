@@ -14,7 +14,7 @@ import { type AssetFormData } from '@/hooks/useAssetUpload';
 
 interface ProfessionalUploadFormProps {
   formData: AssetFormData;
-  setFormData: (data: AssetFormData) => void;
+  setFormData: (data: AssetFormData | ((prev: AssetFormData) => AssetFormData)) => void;
   file: File | null;
   setFile: (file: File | null) => void;
   onSubmit: (e: React.FormEvent) => void;
@@ -150,7 +150,7 @@ const ProfessionalUploadForm = ({
                   required
                   value={formData.name}
                   onChange={(e) => {
-                    setFormData(prev => ({ ...prev, name: e.target.value }));
+                    setFormData((prev: AssetFormData) => ({ ...prev, name: e.target.value }));
                     validateField('name', e.target.value);
                   }}
                   placeholder="e.g., GPT-4 Vision Model"
@@ -165,7 +165,7 @@ const ProfessionalUploadForm = ({
 
               <AssetTypeSelector
                 value={formData.asset_type}
-                onChange={(value) => setFormData(prev => ({ ...prev, asset_type: value }))}
+                onChange={(value) => setFormData((prev: AssetFormData) => ({ ...prev, asset_type: value }))}
               />
             </div>
 
@@ -175,7 +175,7 @@ const ProfessionalUploadForm = ({
                 required
                 value={formData.description}
                 onChange={(e) => {
-                  setFormData(prev => ({ ...prev, description: e.target.value }));
+                  setFormData((prev: AssetFormData) => ({ ...prev, description: e.target.value }));
                   validateField('description', e.target.value);
                 }}
                 placeholder="Describe your asset's capabilities, use cases, and unique features. Be detailed and specific to attract the right investors..."
@@ -196,7 +196,7 @@ const ProfessionalUploadForm = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <LicenseTypeSelector
                 value={formData.license_type}
-                onChange={(value) => setFormData(prev => ({ ...prev, license_type: value }))}
+                onChange={(value) => setFormData((prev: AssetFormData) => ({ ...prev, license_type: value }))}
               />
 
               <div className="space-y-2">
@@ -211,7 +211,7 @@ const ProfessionalUploadForm = ({
                     max="10000"
                     value={formData.initial_price}
                     onChange={(e) => {
-                      setFormData(prev => ({ ...prev, initial_price: e.target.value }));
+                      setFormData((prev: AssetFormData) => ({ ...prev, initial_price: e.target.value }));
                       validateField('initial_price', e.target.value);
                     }}
                     className={`bg-slate-800 border-slate-600 text-white pl-10 ${
@@ -230,7 +230,7 @@ const ProfessionalUploadForm = ({
                 <label className="text-sm font-medium text-slate-300">Custom License Terms</label>
                 <Textarea
                   value={formData.custom_license_terms}
-                  onChange={(e) => setFormData(prev => ({ ...prev, custom_license_terms: e.target.value }))}
+                  onChange={(e) => setFormData((prev: AssetFormData) => ({ ...prev, custom_license_terms: e.target.value }))}
                   placeholder="Specify your custom license terms and conditions..."
                   className="bg-slate-800 border-slate-600 text-white"
                 />
@@ -244,7 +244,7 @@ const ProfessionalUploadForm = ({
                   <Github className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <Input
                     value={formData.github_url}
-                    onChange={(e) => setFormData(prev => ({ ...prev, github_url: e.target.value }))}
+                    onChange={(e) => setFormData((prev: AssetFormData) => ({ ...prev, github_url: e.target.value }))}
                     placeholder="https://github.com/username/repository"
                     className="bg-slate-800 border-slate-600 text-white pl-10"
                   />
@@ -257,7 +257,7 @@ const ProfessionalUploadForm = ({
                   <Link className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <Input
                     value={formData.model_url}
-                    onChange={(e) => setFormData(prev => ({ ...prev, model_url: e.target.value }))}
+                    onChange={(e) => setFormData((prev: AssetFormData) => ({ ...prev, model_url: e.target.value }))}
                     placeholder="https://huggingface.co/model or demo link"
                     className="bg-slate-800 border-slate-600 text-white pl-10"
                   />
@@ -269,7 +269,7 @@ const ProfessionalUploadForm = ({
 
             <TagManager
               tags={formData.tags}
-              onTagsChange={(tags) => setFormData(prev => ({ ...prev, tags }))}
+              onTagsChange={(tags) => setFormData((prev: AssetFormData) => ({ ...prev, tags }))}
             />
 
             {/* Professional Info Box */}
