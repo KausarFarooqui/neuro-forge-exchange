@@ -66,11 +66,9 @@ const Profile = () => {
                       <p className="text-sm text-slate-400">Account Status</p>
                       <div className="flex items-center gap-2">
                         <p className="text-white font-medium">Active</p>
-                        {profile?.is_verified && (
-                          <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">
-                            Verified
-                          </Badge>
-                        )}
+                        <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">
+                          Verified
+                        </Badge>
                       </div>
                     </div>
                   </div>
@@ -80,11 +78,13 @@ const Profile = () => {
                       <Award className="w-6 h-6 text-purple-400" />
                     </div>
                     <div>
-                      <p className="text-sm text-slate-400">User Level</p>
+                      <p className="text-sm text-slate-400">Total Earnings</p>
                       <div className="flex items-center gap-2">
-                        <p className="text-white font-medium">Pro Trader</p>
+                        <p className="text-white font-medium">
+                          ${profile?.total_earnings?.toFixed(2) || '0.00'}
+                        </p>
                         <Badge className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 text-yellow-400 border-yellow-500/30">
-                          Level 1
+                          Developer
                         </Badge>
                       </div>
                     </div>

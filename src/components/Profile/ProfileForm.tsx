@@ -18,13 +18,11 @@ interface ProfileFormProps {
 const ProfileForm = ({ profile, onUpdate, loading }: ProfileFormProps) => {
   const [formData, setFormData] = useState({
     username: profile?.username || '',
-    first_name: profile?.first_name || '',
-    last_name: profile?.last_name || '',
+    full_name: profile?.full_name || '',
     bio: profile?.bio || '',
     company: profile?.company || '',
     website: profile?.website || '',
-    location: profile?.location || '',
-    avatar_url: profile?.avatar_url || '',
+    github_username: profile?.github_username || '',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -33,9 +31,12 @@ const ProfileForm = ({ profile, onUpdate, loading }: ProfileFormProps) => {
   };
 
   const getInitials = () => {
-    const first = formData.first_name || profile?.first_name || '';
-    const last = formData.last_name || profile?.last_name || '';
-    return `${first.charAt(0)}${last.charAt(0)}`.toUpperCase();
+    const name = formData.full_name || profile?.full_name || '';
+    const parts = name.split(' ');
+    if (parts.length >= 2) {
+      return `${parts[0].charAt(0)}${parts[parts.length - 1].charAt(0)}`.toUpperCase();
+    }
+    return name.charAt(0).toUpperCase();
   };
 
   return (
@@ -52,7 +53,6 @@ const ProfileForm = ({ profile, onUpdate, loading }: ProfileFormProps) => {
           <div className="flex items-center gap-6">
             <div className="relative">
               <Avatar className="w-24 h-24 border-2 border-cyan-500/30">
-                <AvatarImage src={formData.avatar_url} />
                 <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-xl">
                   {getInitials()}
                 </AvatarFallback>
@@ -66,20 +66,6 @@ const ProfileForm = ({ profile, onUpdate, loading }: ProfileFormProps) => {
               </Button>
             </div>
             <div className="flex-1">
-              <Label htmlFor="avatar_url" className="text-slate-300">Avatar URL</Label>
-              <Input
-                id="avatar_url"
-                value={formData.avatar_url}
-                onChange={(e) => setFormData({ ...formData, avatar_url: e.target.value })}
-                placeholder="https://example.com/avatar.jpg"
-                className="bg-slate-800 border-slate-600 text-white mt-1"
-              />
-            </div>
-          </div>
-
-          {/* Basic Information */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
               <Label htmlFor="username" className="text-slate-300">Username</Label>
               <Input
                 id="username"
@@ -89,42 +75,18 @@ const ProfileForm = ({ profile, onUpdate, loading }: ProfileFormProps) => {
                 className="bg-slate-800 border-slate-600 text-white mt-1"
               />
             </div>
-            <div>
-              <Label htmlFor="first_name" className="text-slate-300">First Name</Label>
-              <Input
-                id="first_name"
-                value={formData.first_name}
-                onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
-                placeholder="Enter first name"
-                className="bg-slate-800 border-slate-600 text-white mt-1"
-              />
-            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="last_name" className="text-slate-300">Last Name</Label>
-              <Input
-                id="last_name"
-                value={formData.last_name}
-                onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
-                placeholder="Enter last name"
-                className="bg-slate-800 border-slate-600 text-white mt-1"
-              />
-            </div>
-            <div>
-              <Label htmlFor="location" className="text-slate-300 flex items-center gap-1">
-                <MapPin className="w-4 h-4" />
-                Location
-              </Label>
-              <Input
-                id="location"
-                value={formData.location}
-                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                placeholder="City, Country"
-                className="bg-slate-800 border-slate-600 text-white mt-1"
-              />
-            </div>
+          {/* Basic Information */}
+          <div>
+            <Label htmlFor="full_name" className="text-slate-300">Full Name</Label>
+            <Input
+              id="full_name"
+              value={formData.full_name}
+              onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+              placeholder="Enter your full name"
+              className="bg-slate-800 border-slate-600 text-white mt-1"
+            />
           </div>
 
           {/* Professional Information */}
@@ -155,6 +117,17 @@ const ProfileForm = ({ profile, onUpdate, loading }: ProfileFormProps) => {
                 className="bg-slate-800 border-slate-600 text-white mt-1"
               />
             </div>
+          </div>
+
+          <div>
+            <Label htmlFor="github_username" className="text-slate-300">GitHub Username</Label>
+            <Input
+              id="github_username"
+              value={formData.github_username}
+              onChange={(e) => setFormData({ ...formData, github_username: e.target.value })}
+              placeholder="your-github-username"
+              className="bg-slate-800 border-slate-600 text-white mt-1"
+            />
           </div>
 
           {/* Bio */}
