@@ -84,6 +84,50 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_suggestions: {
+        Row: {
+          accepted: boolean | null
+          created_at: string | null
+          customer_id: string | null
+          id: string
+          input_data: Json | null
+          reasoning: string | null
+          restaurant_id: string | null
+          suggested_items: Json | null
+          suggestion_type: string | null
+        }
+        Insert: {
+          accepted?: boolean | null
+          created_at?: string | null
+          customer_id?: string | null
+          id?: string
+          input_data?: Json | null
+          reasoning?: string | null
+          restaurant_id?: string | null
+          suggested_items?: Json | null
+          suggestion_type?: string | null
+        }
+        Update: {
+          accepted?: boolean | null
+          created_at?: string | null
+          customer_id?: string | null
+          id?: string
+          input_data?: Json | null
+          reasoning?: string | null
+          restaurant_id?: string | null
+          suggested_items?: Json | null
+          suggestion_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_suggestions_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       analytics_events: {
         Row: {
           event_data: Json | null
@@ -115,6 +159,44 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "analytics_events_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ar_themes: {
+        Row: {
+          active: boolean | null
+          ar_assets_url: string | null
+          created_at: string | null
+          id: string
+          restaurant_id: string | null
+          theme_name: string
+          theme_type: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          ar_assets_url?: string | null
+          created_at?: string | null
+          id?: string
+          restaurant_id?: string | null
+          theme_name: string
+          theme_type?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          ar_assets_url?: string | null
+          created_at?: string | null
+          id?: string
+          restaurant_id?: string | null
+          theme_name?: string
+          theme_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ar_themes_restaurant_id_fkey"
             columns: ["restaurant_id"]
             isOneToOne: false
             referencedRelation: "restaurants"
@@ -245,6 +327,134 @@ export type Database = {
           },
         ]
       }
+      dine_tokens: {
+        Row: {
+          amount: number
+          created_at: string | null
+          customer_id: string | null
+          expiry_date: string | null
+          id: string
+          order_id: string | null
+          restaurant_id: string | null
+          token_type: string | null
+          transaction_hash: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          customer_id?: string | null
+          expiry_date?: string | null
+          id?: string
+          order_id?: string | null
+          restaurant_id?: string | null
+          token_type?: string | null
+          transaction_hash?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          customer_id?: string | null
+          expiry_date?: string | null
+          id?: string
+          order_id?: string | null
+          restaurant_id?: string | null
+          token_type?: string | null
+          transaction_hash?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dine_tokens_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dine_tokens_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      food_health_scores: {
+        Row: {
+          alternative_suggestions: string[] | null
+          created_at: string | null
+          health_score: number | null
+          health_tags: string[] | null
+          id: string
+          menu_item_id: string | null
+          nutritional_data: Json | null
+        }
+        Insert: {
+          alternative_suggestions?: string[] | null
+          created_at?: string | null
+          health_score?: number | null
+          health_tags?: string[] | null
+          id?: string
+          menu_item_id?: string | null
+          nutritional_data?: Json | null
+        }
+        Update: {
+          alternative_suggestions?: string[] | null
+          created_at?: string | null
+          health_score?: number | null
+          health_tags?: string[] | null
+          id?: string
+          menu_item_id?: string | null
+          nutritional_data?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "food_health_scores_menu_item_id_fkey"
+            columns: ["menu_item_id"]
+            isOneToOne: false
+            referencedRelation: "menu_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      health_profiles: {
+        Row: {
+          allergies: string[] | null
+          calorie_target: number | null
+          created_at: string | null
+          customer_id: string | null
+          dietary_restrictions: string[] | null
+          fitness_goals: string[] | null
+          health_conditions: string[] | null
+          id: string
+          preferred_cuisines: string[] | null
+          updated_at: string | null
+        }
+        Insert: {
+          allergies?: string[] | null
+          calorie_target?: number | null
+          created_at?: string | null
+          customer_id?: string | null
+          dietary_restrictions?: string[] | null
+          fitness_goals?: string[] | null
+          health_conditions?: string[] | null
+          id?: string
+          preferred_cuisines?: string[] | null
+          updated_at?: string | null
+        }
+        Update: {
+          allergies?: string[] | null
+          calorie_target?: number | null
+          created_at?: string | null
+          customer_id?: string | null
+          dietary_restrictions?: string[] | null
+          fitness_goals?: string[] | null
+          health_conditions?: string[] | null
+          id?: string
+          preferred_cuisines?: string[] | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       loyalty_programs: {
         Row: {
           created_at: string | null
@@ -294,51 +504,63 @@ export type Database = {
       }
       menu_items: {
         Row: {
+          ai_generated: boolean | null
           allergens: string[] | null
           availability: boolean | null
           calories: number | null
           category: string | null
           created_at: string | null
+          cuisine_fusion: string[] | null
           description: string | null
           dietary_info: string[] | null
           id: string
           image_url: string | null
           ingredients: string[] | null
+          mood_tags: string[] | null
           name: string
+          occasion_tags: string[] | null
           preparation_time: number | null
           price: number
           restaurant_id: string | null
           updated_at: string | null
         }
         Insert: {
+          ai_generated?: boolean | null
           allergens?: string[] | null
           availability?: boolean | null
           calories?: number | null
           category?: string | null
           created_at?: string | null
+          cuisine_fusion?: string[] | null
           description?: string | null
           dietary_info?: string[] | null
           id?: string
           image_url?: string | null
           ingredients?: string[] | null
+          mood_tags?: string[] | null
           name: string
+          occasion_tags?: string[] | null
           preparation_time?: number | null
           price: number
           restaurant_id?: string | null
           updated_at?: string | null
         }
         Update: {
+          ai_generated?: boolean | null
           allergens?: string[] | null
           availability?: boolean | null
           calories?: number | null
           category?: string | null
           created_at?: string | null
+          cuisine_fusion?: string[] | null
           description?: string | null
           dietary_info?: string[] | null
           id?: string
           image_url?: string | null
           ingredients?: string[] | null
+          mood_tags?: string[] | null
           name?: string
+          occasion_tags?: string[] | null
           preparation_time?: number | null
           price?: number
           restaurant_id?: string | null
@@ -470,13 +692,18 @@ export type Database = {
           cuisine_type: string | null
           description: string | null
           email: string | null
+          features_enabled: string[] | null
           id: string
+          max_tables: number | null
+          monthly_revenue: number | null
           name: string
           operating_hours: Json | null
           owner_id: string | null
           phone: string | null
+          plan_type: string | null
           status: string | null
           subscription_tier: string | null
+          tenant_id: string | null
           updated_at: string | null
           website: string | null
         }
@@ -486,13 +713,18 @@ export type Database = {
           cuisine_type?: string | null
           description?: string | null
           email?: string | null
+          features_enabled?: string[] | null
           id?: string
+          max_tables?: number | null
+          monthly_revenue?: number | null
           name: string
           operating_hours?: Json | null
           owner_id?: string | null
           phone?: string | null
+          plan_type?: string | null
           status?: string | null
           subscription_tier?: string | null
+          tenant_id?: string | null
           updated_at?: string | null
           website?: string | null
         }
@@ -502,17 +734,157 @@ export type Database = {
           cuisine_type?: string | null
           description?: string | null
           email?: string | null
+          features_enabled?: string[] | null
           id?: string
+          max_tables?: number | null
+          monthly_revenue?: number | null
           name?: string
           operating_hours?: Json | null
           owner_id?: string | null
           phone?: string | null
+          plan_type?: string | null
           status?: string | null
           subscription_tier?: string | null
+          tenant_id?: string | null
           updated_at?: string | null
           website?: string | null
         }
         Relationships: []
+      }
+      smart_tables: {
+        Row: {
+          created_at: string | null
+          current_session_id: string | null
+          id: string
+          last_cleaned: string | null
+          nfc_tag_id: string | null
+          qr_code_url: string | null
+          restaurant_id: string | null
+          status: string | null
+          table_number: number
+        }
+        Insert: {
+          created_at?: string | null
+          current_session_id?: string | null
+          id?: string
+          last_cleaned?: string | null
+          nfc_tag_id?: string | null
+          qr_code_url?: string | null
+          restaurant_id?: string | null
+          status?: string | null
+          table_number: number
+        }
+        Update: {
+          created_at?: string | null
+          current_session_id?: string | null
+          id?: string
+          last_cleaned?: string | null
+          nfc_tag_id?: string | null
+          qr_code_url?: string | null
+          restaurant_id?: string | null
+          status?: string | null
+          table_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "smart_tables_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      staff_members: {
+        Row: {
+          active: boolean | null
+          created_at: string | null
+          email: string | null
+          id: string
+          name: string
+          performance_metrics: Json | null
+          phone: string | null
+          restaurant_id: string | null
+          role: string | null
+          shift_schedule: Json | null
+          user_id: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          name: string
+          performance_metrics?: Json | null
+          phone?: string | null
+          restaurant_id?: string | null
+          role?: string | null
+          shift_schedule?: Json | null
+          user_id?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          name?: string
+          performance_metrics?: Json | null
+          phone?: string | null
+          restaurant_id?: string | null
+          role?: string | null
+          shift_schedule?: Json | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_members_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      table_feedback: {
+        Row: {
+          emotion_data: Json | null
+          feedback_text: string | null
+          id: string
+          restaurant_id: string | null
+          service_rating: number | null
+          staff_id: string | null
+          table_number: number | null
+          timestamp: string | null
+        }
+        Insert: {
+          emotion_data?: Json | null
+          feedback_text?: string | null
+          id?: string
+          restaurant_id?: string | null
+          service_rating?: number | null
+          staff_id?: string | null
+          table_number?: number | null
+          timestamp?: string | null
+        }
+        Update: {
+          emotion_data?: Json | null
+          feedback_text?: string | null
+          id?: string
+          restaurant_id?: string | null
+          service_rating?: number | null
+          staff_id?: string | null
+          table_number?: number | null
+          timestamp?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "table_feedback_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_profiles: {
         Row: {
@@ -552,6 +924,44 @@ export type Database = {
           website?: string | null
         }
         Relationships: []
+      }
+      voice_orders: {
+        Row: {
+          audio_file_url: string | null
+          confidence_score: number | null
+          created_at: string | null
+          id: string
+          order_id: string | null
+          processed_intent: Json | null
+          transcription: string | null
+        }
+        Insert: {
+          audio_file_url?: string | null
+          confidence_score?: number | null
+          created_at?: string | null
+          id?: string
+          order_id?: string | null
+          processed_intent?: Json | null
+          transcription?: string | null
+        }
+        Update: {
+          audio_file_url?: string | null
+          confidence_score?: number | null
+          created_at?: string | null
+          id?: string
+          order_id?: string | null
+          processed_intent?: Json | null
+          transcription?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "voice_orders_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
