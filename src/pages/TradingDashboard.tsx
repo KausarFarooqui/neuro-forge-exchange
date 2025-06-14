@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import NavigationHeader from '@/components/NavigationHeader';
@@ -44,34 +45,21 @@ const TradingDashboard = () => {
   } = useRealTimeTrading();
   
   const { toast } = useToast();
-  const [positions, setPositions] = useState([
-    {
-      id: '1',
-      symbol: 'NVDA',
-      name: 'NVIDIA Corporation',
-      quantity: 100,
-      avgPrice: 820.50,
-      currentPrice: 875.23,
-      marketValue: 87523,
-      unrealizedPnL: 5473,
-      unrealizedPnLPercent: 6.67,
-      dayChange: 4567,
-      dayChangePercent: 5.51
-    },
-    {
-      id: '2',
-      symbol: 'GOOGL',
-      name: 'Alphabet Inc Class A',
-      quantity: 50,
-      avgPrice: 2900.00,
-      currentPrice: 2850.45,
-      marketValue: 142522.50,
-      unrealizedPnL: -2477.50,
-      unrealizedPnLPercent: -1.71,
-      dayChange: -790,
-      dayChangePercent: -0.55
-    }
-  ]);
+
+  // Convert portfolio positions to match Position interface
+  const positions: Position[] = portfolio.positions.map(pos => ({
+    id: pos.id,
+    symbol: pos.symbol,
+    name: `${pos.symbol} Corporation`, // Add a generic name
+    quantity: pos.quantity,
+    avgPrice: pos.avgPrice,
+    currentPrice: pos.currentPrice,
+    marketValue: pos.totalValue,
+    unrealizedPnL: pos.unrealizedPnL,
+    unrealizedPnLPercent: pos.unrealizedPnLPercent,
+    dayChange: pos.unrealizedPnL * 0.3, // Approximate day change as 30% of unrealized P&L
+    dayChangePercent: pos.unrealizedPnLPercent * 0.3
+  }));
 
   // Check API configuration status
   useEffect(() => {
@@ -108,15 +96,35 @@ const TradingDashboard = () => {
   };
 
   const handleClosePosition = (positionId: string) => {
-    setPositions(prev => prev.filter(p => p.id !== positionId));
-    toast({
-      title: "Position Closed",
-      description: "Position has been successfully closed",
-    });
+    // Find the position to close
+    const position = positions.find(p => p.id === positionId);
+    if (position) {
+      // Execute a sell order for the entire position
+      const sellOrder = {
+        symbol: position.symbol,
+        type: 'sell' as const,
+        orderType: 'market' as const,
+        quantity: position.quantity,
+        timeInForce: 'GTC' as const
+      };
+      
+      executeTrade(sellOrder).then(result => {
+        if (result.success) {
+          toast({
+            title: "Position Closed",
+            description: `Successfully closed ${position.quantity} shares of ${position.symbol}`,
+          });
+        }
+      });
+    }
   };
 
   const handleEditPosition = (positionId: string) => {
     console.log('Edit position:', positionId);
+    toast({
+      title: "Edit Position",
+      description: "Position editing feature coming soon",
+    });
   };
 
   const handleApiConfigured = () => {
