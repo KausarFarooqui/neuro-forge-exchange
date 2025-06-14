@@ -18,6 +18,7 @@ import { useToast } from '@/hooks/use-toast';
 const TradingDashboard = () => {
   const { symbol = 'NVDA' } = useParams();
   const [selectedSymbol, setSelectedSymbol] = useState(symbol);
+  const [activeTab, setActiveTab] = useState('trading');
   const { toast } = useToast();
   
   const {
@@ -60,9 +61,10 @@ const TradingDashboard = () => {
       isConnected,
       currentPrice,
       symbol: selectedSymbol,
-      loading
+      loading,
+      activeTab
     });
-  }, [isApiConfigured, isConnected, currentPrice, selectedSymbol, loading]);
+  }, [isApiConfigured, isConnected, currentPrice, selectedSymbol, loading, activeTab]);
 
   const handleTrade = async (trade: any) => {
     console.log('Executing trade:', trade);
@@ -148,29 +150,43 @@ const TradingDashboard = () => {
 
       <TradingStats stockData={stockData} />
 
-      <TradingLayout
-        selectedSymbol={selectedSymbol}
-        chartData={chartData}
-        displayPrice={currentPrice}
-        displayChange={displayChange}
-        displayChangePercent={displayChangePercent}
-        depthData={depthData}
-        spread={spread}
-        spreadPercent={spreadPercent}
-        portfolio={portfolio}
-        orderBook={orderBook}
-        prices={prices}
-        onTrade={handleTrade}
-        onSymbolSelect={setSelectedSymbol}
-      />
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-3 bg-slate-800 mb-6">
+          <TabsTrigger value="trading" className="text-white">Trading Interface</TabsTrigger>
+          <TabsTrigger value="portfolio" className="text-white">AI Portfolio</TabsTrigger>
+          <TabsTrigger value="positions" className="text-white">Positions</TabsTrigger>
+        </TabsList>
 
-      <div className="mt-8">
-        <PositionsManager
-          positions={positions}
-          onClosePosition={handleClosePosition}
-          onEditPosition={handleEditPosition}
-        />
-      </div>
+        <TabsContent value="trading" className="space-y-6">
+          <TradingLayout
+            selectedSymbol={selectedSymbol}
+            chartData={chartData}
+            displayPrice={currentPrice}
+            displayChange={displayChange}
+            displayChangePercent={displayChangePercent}
+            depthData={depthData}
+            spread={spread}
+            spreadPercent={spreadPercent}
+            portfolio={portfolio}
+            orderBook={orderBook}
+            prices={prices}
+            onTrade={handleTrade}
+            onSymbolSelect={setSelectedSymbol}
+          />
+        </TabsContent>
+
+        <TabsContent value="portfolio" className="space-y-6">
+          <RealPortfolioBoard />
+        </TabsContent>
+
+        <TabsContent value="positions" className="space-y-6">
+          <PositionsManager
+            positions={positions}
+            onClosePosition={handleClosePosition}
+            onEditPosition={handleEditPosition}
+          />
+        </TabsContent>
+      </Tabs>
     </TradingDashboardLayout>
   );
 };
