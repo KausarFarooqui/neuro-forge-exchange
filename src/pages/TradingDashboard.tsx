@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import NavigationHeader from '@/components/NavigationHeader';
@@ -13,6 +12,20 @@ import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Settings, Wifi } from 'lucide-react';
+
+interface Position {
+  id: string;
+  symbol: string;
+  name: string;
+  quantity: number;
+  avgPrice: number;
+  currentPrice: number;
+  marketValue: number;
+  unrealizedPnL: number;
+  unrealizedPnLPercent: number;
+  dayChange: number;
+  dayChangePercent: number;
+}
 
 const TradingDashboard = () => {
   const { symbol = 'NVDA' } = useParams();
@@ -31,6 +44,34 @@ const TradingDashboard = () => {
   } = useRealTimeTrading();
   
   const { toast } = useToast();
+  const [positions, setPositions] = useState([
+    {
+      id: '1',
+      symbol: 'NVDA',
+      name: 'NVIDIA Corporation',
+      quantity: 100,
+      avgPrice: 820.50,
+      currentPrice: 875.23,
+      marketValue: 87523,
+      unrealizedPnL: 5473,
+      unrealizedPnLPercent: 6.67,
+      dayChange: 4567,
+      dayChangePercent: 5.51
+    },
+    {
+      id: '2',
+      symbol: 'GOOGL',
+      name: 'Alphabet Inc Class A',
+      quantity: 50,
+      avgPrice: 2900.00,
+      currentPrice: 2850.45,
+      marketValue: 142522.50,
+      unrealizedPnL: -2477.50,
+      unrealizedPnLPercent: -1.71,
+      dayChange: -790,
+      dayChangePercent: -0.55
+    }
+  ]);
 
   // Check API configuration status
   useEffect(() => {
@@ -67,34 +108,15 @@ const TradingDashboard = () => {
   };
 
   const handleClosePosition = (positionId: string) => {
-    // Find the position to close
-    const position = portfolio.positions.find(p => p.id === positionId);
-    if (position) {
-      // Execute a sell order for the entire position
-      const sellOrder = {
-        symbol: position.symbol,
-        type: 'sell' as const,
-        orderType: 'market' as const,
-        quantity: position.quantity,
-        timeInForce: 'GTC' as const
-      };
-      
-      executeTrade(sellOrder);
-      
-      toast({
-        title: "Position Closed",
-        description: `Closed ${position.quantity} shares of ${position.symbol}`,
-      });
-    }
+    setPositions(prev => prev.filter(p => p.id !== positionId));
+    toast({
+      title: "Position Closed",
+      description: "Position has been successfully closed",
+    });
   };
 
   const handleEditPosition = (positionId: string) => {
     console.log('Edit position:', positionId);
-    // This could open a modal or navigate to an edit page
-    toast({
-      title: "Edit Position",
-      description: "Position editing feature coming soon",
-    });
   };
 
   const handleApiConfigured = () => {
@@ -226,21 +248,6 @@ const TradingDashboard = () => {
     pe: quote?.pe || 68.5,
     beta: 1.68
   };
-
-  // Convert portfolio positions to the format expected by PositionsManager
-  const positions = portfolio.positions.map(position => ({
-    id: position.id,
-    symbol: position.symbol,
-    name: `Position in ${position.symbol}`, // You could enhance this with company names
-    quantity: position.quantity,
-    avgPrice: position.avgPrice,
-    currentPrice: position.currentPrice,
-    marketValue: position.totalValue,
-    unrealizedPnL: position.unrealizedPnL,
-    unrealizedPnLPercent: position.unrealizedPnLPercent,
-    dayChange: position.unrealizedPnL * 0.1, // Approximate day change
-    dayChangePercent: position.unrealizedPnLPercent * 0.1
-  }));
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-purple-950">
