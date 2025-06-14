@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -11,6 +10,7 @@ import ApiSetupPrompt from '@/components/Trading/ApiSetupPrompt';
 import LoadingScreen from '@/components/Trading/LoadingScreen';
 import ErrorAlert from '@/components/Trading/ErrorAlert';
 import RealPortfolioBoard from '@/components/RealPortfolioBoard';
+import AITradingBot from '@/components/AITradingBot';
 import { useTradingData } from '@/hooks/useTradingData';
 import { useApiConfiguration } from '@/hooks/useApiConfiguration';
 import { useToast } from '@/hooks/use-toast';
@@ -151,8 +151,9 @@ const TradingDashboard = () => {
       <TradingStats stockData={stockData} />
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3 bg-slate-800 mb-6">
+        <TabsList className="grid w-full grid-cols-4 bg-slate-800 mb-6">
           <TabsTrigger value="trading" className="text-white">Trading Interface</TabsTrigger>
+          <TabsTrigger value="ai-bot" className="text-white">AI Trading Bot</TabsTrigger>
           <TabsTrigger value="portfolio" className="text-white">AI Portfolio</TabsTrigger>
           <TabsTrigger value="positions" className="text-white">Positions</TabsTrigger>
         </TabsList>
@@ -173,6 +174,10 @@ const TradingDashboard = () => {
             onTrade={handleTrade}
             onSymbolSelect={setSelectedSymbol}
           />
+        </TabsContent>
+
+        <TabsContent value="ai-bot" className="space-y-6">
+          <AITradingBot onExecuteTrade={handleTrade} />
         </TabsContent>
 
         <TabsContent value="portfolio" className="space-y-6">

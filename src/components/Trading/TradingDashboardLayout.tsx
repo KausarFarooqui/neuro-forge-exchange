@@ -1,6 +1,6 @@
 
 import { ReactNode } from 'react';
-import NavigationHeader from '@/components/NavigationHeader';
+import DeploymentHealthCheck from '@/components/DeploymentHealthCheck';
 
 interface TradingDashboardLayoutProps {
   children: ReactNode;
@@ -8,11 +8,17 @@ interface TradingDashboardLayoutProps {
 
 const TradingDashboardLayout = ({ children }: TradingDashboardLayoutProps) => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-purple-950">
-      <NavigationHeader activeTab="trading" setActiveTab={() => {}} />
-      <main className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      <div className="container mx-auto px-4 py-6 space-y-6">
         {children}
-      </main>
+        
+        {/* Health Check - Only show in development or if needed */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className="mt-8">
+            <DeploymentHealthCheck />
+          </div>
+        )}
+      </div>
     </div>
   );
 };
