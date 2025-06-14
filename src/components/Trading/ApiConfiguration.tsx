@@ -8,11 +8,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Settings, Key, CheckCircle, AlertTriangle } from 'lucide-react';
-import { stockApiService } from '@/services/stockApiService';
+import { stockApiService, type StockApiConfig } from '@/services/stockApiService';
 import { useToast } from '@/hooks/use-toast';
 
 interface ApiProvider {
-  id: string;
+  id: StockApiConfig['provider'];
   name: string;
   baseUrl: string;
   description: string;
@@ -61,7 +61,7 @@ const API_PROVIDERS: ApiProvider[] = [
 ];
 
 const ApiConfiguration = () => {
-  const [selectedProvider, setSelectedProvider] = useState('');
+  const [selectedProvider, setSelectedProvider] = useState<StockApiConfig['provider'] | ''>('');
   const [apiKey, setApiKey] = useState('');
   const [isConfigured, setIsConfigured] = useState(false);
   const [isTestingConnection, setIsTestingConnection] = useState(false);
@@ -103,7 +103,7 @@ const ApiConfiguration = () => {
     const provider = API_PROVIDERS.find(p => p.id === selectedProvider);
     if (!provider) return;
 
-    const config = {
+    const config: StockApiConfig = {
       provider: selectedProvider,
       apiKey,
       baseUrl: provider.baseUrl
@@ -190,7 +190,7 @@ const ApiConfiguration = () => {
 
             <div>
               <Label className="text-slate-300">Select API Provider</Label>
-              <Select value={selectedProvider} onValueChange={setSelectedProvider}>
+              <Select value={selectedProvider} onValueChange={(value) => setSelectedProvider(value as StockApiConfig['provider'])}>
                 <SelectTrigger className="bg-slate-800 border-slate-600 text-white">
                   <SelectValue placeholder="Choose a provider" />
                 </SelectTrigger>
