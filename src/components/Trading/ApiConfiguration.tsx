@@ -72,26 +72,31 @@ const ApiConfiguration = () => {
     // Check if API is already configured
     const savedConfig = localStorage.getItem('stockApiConfig');
     if (savedConfig) {
-      const config = JSON.parse(savedConfig);
-      setSelectedProvider(config.provider);
-      setApiKey(config.apiKey);
-      setIsConfigured(true);
-      setConnectionStatus('success');
-      
-      // Set the configuration in the service
-      const provider = API_PROVIDERS.find(p => p.id === config.provider);
-      if (provider) {
-        stockApiService.setConfig({
-          provider: config.provider,
-          apiKey: config.apiKey,
-          baseUrl: provider.baseUrl
-        });
+      try {
+        const config = JSON.parse(savedConfig);
+        setSelectedProvider(config.provider);
+        setApiKey(config.apiKey);
+        setIsConfigured(true);
+        setConnectionStatus('success');
+        
+        // Set the configuration in the service
+        const provider = API_PROVIDERS.find(p => p.id === config.provider);
+        if (provider) {
+          stockApiService.setConfig({
+            provider: config.provider,
+            apiKey: config.apiKey,
+            baseUrl: provider.baseUrl
+          });
+        }
+      } catch (error) {
+        console.error('Error parsing saved config:', error);
+        localStorage.removeItem('stockApiConfig');
       }
     }
   }, []);
 
   const handleSaveConfiguration = async () => {
-    if (!selectedProvider || !apiKey) {
+    if (!selectedProvider || !apiKey.trim()) {
       toast({
         title: "Missing Information",
         description: "Please select a provider and enter your API key",
@@ -105,7 +110,7 @@ const ApiConfiguration = () => {
 
     const config: StockApiConfig = {
       provider: selectedProvider,
-      apiKey,
+      apiKey: apiKey.trim(),
       baseUrl: provider.baseUrl
     };
 
@@ -119,6 +124,9 @@ const ApiConfiguration = () => {
     
     // Test the connection
     await testConnection();
+    
+    // Trigger a storage event to notify other components
+    window.dispatchEvent(new Event('storage'));
   };
 
   const testConnection = async () => {
@@ -133,16 +141,17 @@ const ApiConfiguration = () => {
         setConnectionStatus('success');
         toast({
           title: "Connection Successful",
-          description: `Successfully connected to ${API_PROVIDERS.find(p => p.id === selectedProvider)?.name}`,
+          description: `Successfully connected to ${API_PROVIDERS.find(p => p.id === selectedProvider)?.name}. Real-time data is now active!`,
         });
       } else {
-        throw new Error('Invalid response');
+        throw new Error('Invalid response from API');
       }
     } catch (error) {
       setConnectionStatus('error');
+      console.error('Connection test failed:', error);
       toast({
         title: "Connection Failed",
-        description: "Please check your API key and try again",
+        description: "Please check your API key and try again. Make sure your API key is valid and has sufficient quota.",
         variant: "destructive"
       });
     } finally {
@@ -157,9 +166,12 @@ const ApiConfiguration = () => {
     setIsConfigured(false);
     setConnectionStatus('idle');
     
+    // Trigger a storage event to notify other components
+    window.dispatchEvent(new Event('storage'));
+    
     toast({
       title: "Configuration Reset",
-      description: "API configuration has been cleared",
+      description: "API configuration has been cleared. You can now set up a new provider.",
     });
   };
 
@@ -184,12 +196,12 @@ const ApiConfiguration = () => {
               <AlertTriangle className="h-4 w-4" />
               <AlertDescription className="text-blue-400">
                 To access real-time stock market data, you need to configure an API provider. 
-                Choose from the options below and get your free API key.
+                Alpha Vantage is recommended for beginners with a free tier.
               </AlertDescription>
             </Alert>
 
             <div>
-              <Label className="text-slate-300">Select API Provider</Label>
+              <Label className="text-slate-300 mb-2 block">Select API Provider</Label>
               <Select value={selectedProvider} onValueChange={(value) => setSelectedProvider(value as StockApiConfig['provider'])}>
                 <SelectTrigger className="bg-slate-800 border-slate-600 text-white">
                   <SelectValue placeholder="Choose a provider" />
@@ -219,7 +231,7 @@ const ApiConfiguration = () => {
                     </Badge>
                   ))}
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 mb-3">
                   <span className="text-slate-400 text-sm">Pricing:</span>
                   <span className="text-green-400 text-sm">
                     {API_PROVIDERS.find(p => p.id === selectedProvider)?.pricing}
@@ -228,8 +240,8 @@ const ApiConfiguration = () => {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="mt-2"
                   onClick={() => window.open(API_PROVIDERS.find(p => p.id === selectedProvider)?.signupUrl, '_blank')}
+                  className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
                 >
                   Get API Key
                 </Button>
@@ -237,23 +249,24 @@ const ApiConfiguration = () => {
             )}
 
             <div>
-              <Label className="text-slate-300">API Key</Label>
+              <Label className="text-slate-300 mb-2 block">API Key</Label>
               <Input
                 type="password"
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
-                placeholder="Enter your API key"
+                placeholder="Enter your API key here..."
                 className="bg-slate-800 border-slate-600 text-white"
               />
+              <p className="text-slate-400 text-xs mt-1">Your API key is stored locally and encrypted</p>
             </div>
 
             <Button
               onClick={handleSaveConfiguration}
-              disabled={!selectedProvider || !apiKey || isTestingConnection}
+              disabled={!selectedProvider || !apiKey.trim() || isTestingConnection}
               className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700"
             >
               <Key className="w-4 h-4 mr-2" />
-              {isTestingConnection ? 'Testing Connection...' : 'Save Configuration'}
+              {isTestingConnection ? 'Testing Connection...' : 'Save & Test Configuration'}
             </Button>
           </>
         ) : (

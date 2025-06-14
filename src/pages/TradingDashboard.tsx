@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import NavigationHeader from '@/components/NavigationHeader';
@@ -12,7 +11,7 @@ import { useRealTimeTrading } from '@/hooks/useRealTimeTrading';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Settings } from 'lucide-react';
+import { Settings, Wifi } from 'lucide-react';
 
 interface Position {
   id: string;
@@ -32,6 +31,7 @@ const TradingDashboard = () => {
   const { symbol = 'NVDA' } = useParams();
   const [selectedSymbol, setSelectedSymbol] = useState(symbol);
   const [showApiConfig, setShowApiConfig] = useState(false);
+  const [isApiConfigured, setIsApiConfigured] = useState(false);
   
   const { quote, historicalData, loading, error, isConnected } = useEnhancedStockData(selectedSymbol);
   const { 
@@ -44,7 +44,7 @@ const TradingDashboard = () => {
   } = useRealTimeTrading();
   
   const { toast } = useToast();
-  const [positions, setPositions] = useState<Position[]>([
+  const [positions, setPositions] = useState([
     {
       id: '1',
       symbol: 'NVDA',
@@ -73,12 +73,28 @@ const TradingDashboard = () => {
     }
   ]);
 
-  // Check if API is configured on component mount
+  // Check API configuration status
   useEffect(() => {
-    const savedConfig = localStorage.getItem('stockApiConfig');
-    if (!savedConfig) {
-      setShowApiConfig(true);
-    }
+    const checkApiConfig = () => {
+      const savedConfig = localStorage.getItem('stockApiConfig');
+      const configured = !!savedConfig;
+      setIsApiConfigured(configured);
+      
+      // Show config panel if not configured
+      if (!configured) {
+        setShowApiConfig(true);
+      }
+    };
+
+    checkApiConfig();
+    
+    // Listen for storage changes to update config status
+    const handleStorageChange = () => {
+      checkApiConfig();
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   // Update selected symbol when URL changes
@@ -103,18 +119,32 @@ const TradingDashboard = () => {
     console.log('Edit position:', positionId);
   };
 
-  // Show API configuration if not set up
-  if (showApiConfig) {
+  const handleApiConfigured = () => {
+    setIsApiConfigured(true);
+    setShowApiConfig(false);
+    toast({
+      title: "API Configured",
+      description: "Real-time market data is now active",
+    });
+  };
+
+  // Show API configuration prominently if not set up
+  if (showApiConfig && !isApiConfigured) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-purple-950">
         <NavigationHeader activeTab="trading" setActiveTab={() => {}} />
         
         <main className="container mx-auto px-4 py-8">
           <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-6">
+              <h1 className="text-3xl font-bold text-white mb-2">Configure Market Data</h1>
+              <p className="text-slate-300">Set up your API provider to access real-time stock market data</p>
+            </div>
+            
             <Alert className="mb-6 bg-blue-500/10 border-blue-500/30">
-              <Settings className="h-4 w-4" />
+              <Wifi className="h-4 w-4" />
               <AlertDescription className="text-blue-400">
-                To access real-time market data, please configure your API provider first.
+                To access real-time market data, please configure your API provider. You can get started with a free Alpha Vantage API key.
               </AlertDescription>
             </Alert>
             
@@ -124,8 +154,15 @@ const TradingDashboard = () => {
               <Button
                 onClick={() => setShowApiConfig(false)}
                 variant="outline"
+                className="mr-3"
               >
                 Continue with Mock Data
+              </Button>
+              <Button
+                onClick={() => window.location.href = '/trading-setup'}
+                className="bg-gradient-to-r from-cyan-500 to-blue-600"
+              >
+                Full Setup Guide
               </Button>
             </div>
           </div>
@@ -137,7 +174,10 @@ const TradingDashboard = () => {
   if (loading && !quote) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-purple-950 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-cyan-400"></div>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-cyan-400 mb-4"></div>
+          <p className="text-white">Loading market data...</p>
+        </div>
       </div>
     );
   }
@@ -214,10 +254,19 @@ const TradingDashboard = () => {
       <NavigationHeader activeTab="trading" setActiveTab={() => {}} />
       
       <main className="container mx-auto px-4 py-8">
-        {error && (
-          <Alert className="mb-6 bg-red-500/10 border-red-500/30">
-            <AlertDescription className="text-red-400">
-              {error} - Falling back to mock data for demonstration.
+        {error && !isApiConfigured && (
+          <Alert className="mb-6 bg-yellow-500/10 border-yellow-500/30">
+            <Settings className="h-4 w-4" />
+            <AlertDescription className="text-yellow-400 flex items-center justify-between">
+              <span>{error} - Using mock data for demonstration.</span>
+              <Button 
+                size="sm" 
+                variant="outline"
+                onClick={() => setShowApiConfig(true)}
+                className="ml-4"
+              >
+                Configure API
+              </Button>
             </AlertDescription>
           </Alert>
         )}
