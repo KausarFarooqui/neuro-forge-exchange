@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useToast } from './use-toast';
-import { stockApiService } from '@/services/stockApiService';
+import { stockApiService, type StockApiConfig } from '@/services/stockApiService';
 
 export const useApiConfiguration = () => {
   const [isApiConfigured, setIsApiConfigured] = useState(false);
@@ -15,7 +15,7 @@ export const useApiConfiguration = () => {
       
       // Auto-configure Alpha Vantage if not already set
       if (!configured) {
-        const alphaVantageConfig = {
+        const alphaVantageConfig: StockApiConfig = {
           provider: 'alpha_vantage',
           apiKey: '7ZA3DU9MV65UBXD8',
           baseUrl: 'https://www.alphavantage.co'
