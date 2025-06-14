@@ -455,6 +455,60 @@ export type Database = {
         }
         Relationships: []
       }
+      kitchen_queue: {
+        Row: {
+          assigned_staff: string | null
+          created_at: string | null
+          estimated_completion: string | null
+          id: string
+          order_id: string
+          preparation_notes: string | null
+          priority: number | null
+          restaurant_id: string
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          assigned_staff?: string | null
+          created_at?: string | null
+          estimated_completion?: string | null
+          id?: string
+          order_id: string
+          preparation_notes?: string | null
+          priority?: number | null
+          restaurant_id: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          assigned_staff?: string | null
+          created_at?: string | null
+          estimated_completion?: string | null
+          id?: string
+          order_id?: string
+          preparation_notes?: string | null
+          priority?: number | null
+          restaurant_id?: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kitchen_queue_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "kitchen_queue_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       loyalty_programs: {
         Row: {
           created_at: string | null
@@ -925,6 +979,41 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          assigned_by: string | null
+          created_at: string | null
+          id: string
+          restaurant_id: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          assigned_by?: string | null
+          created_at?: string | null
+          id?: string
+          restaurant_id?: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          assigned_by?: string | null
+          created_at?: string | null
+          id?: string
+          restaurant_id?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_roles_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       voice_orders: {
         Row: {
           audio_file_url: string | null
@@ -972,12 +1061,30 @@ export type Database = {
         Args: Record<PropertyKey, never> | { asset_name: string }
         Returns: string
       }
+      get_user_role: {
+        Args: { _user_id: string; _restaurant_id: string }
+        Returns: Database["public"]["Enums"]["app_role"]
+      }
+      has_role: {
+        Args: {
+          _user_id: string
+          _role: Database["public"]["Enums"]["app_role"]
+          _restaurant_id?: string
+        }
+        Returns: boolean
+      }
       update_asset_price: {
         Args: { asset_id_param: string }
         Returns: number
       }
     }
     Enums: {
+      app_role:
+        | "customer"
+        | "waiter"
+        | "kitchen_staff"
+        | "restaurant_owner"
+        | "super_admin"
       asset_status: "pending" | "approved" | "rejected" | "delisted"
       asset_type:
         | "model"
@@ -1108,6 +1215,13 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: [
+        "customer",
+        "waiter",
+        "kitchen_staff",
+        "restaurant_owner",
+        "super_admin",
+      ],
       asset_status: ["pending", "approved", "rejected", "delisted"],
       asset_type: [
         "model",

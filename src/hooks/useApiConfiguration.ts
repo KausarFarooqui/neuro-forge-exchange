@@ -25,10 +25,17 @@ export const useApiConfiguration = () => {
         stockApiService.setConfig(alphaVantageConfig);
         configured = true;
         
+        console.log('Auto-configured Alpha Vantage API with key:', alphaVantageConfig.apiKey);
+        
         toast({
           title: "API Configured",
           description: "Alpha Vantage API has been automatically configured with your key",
         });
+      } else {
+        // Load existing config
+        const existingConfig = JSON.parse(savedConfig);
+        stockApiService.setConfig(existingConfig);
+        console.log('Loaded existing API config:', existingConfig.provider);
       }
       
       setIsApiConfigured(configured);

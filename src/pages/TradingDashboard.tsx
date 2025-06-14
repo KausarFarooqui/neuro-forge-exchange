@@ -51,9 +51,33 @@ const TradingDashboard = () => {
     setSelectedSymbol(symbol);
   }, [symbol]);
 
+  // Log connection status for debugging
+  useEffect(() => {
+    console.log('Trading Dashboard Status:', {
+      isApiConfigured,
+      isConnected,
+      currentPrice,
+      symbol: selectedSymbol,
+      loading
+    });
+  }, [isApiConfigured, isConnected, currentPrice, selectedSymbol, loading]);
+
   const handleTrade = async (trade: any) => {
     console.log('Executing trade:', trade);
-    return await executeTrade(trade);
+    const result = await executeTrade(trade);
+    if (result.success) {
+      toast({
+        title: "Trade Executed Successfully",
+        description: `${trade.type.toUpperCase()} ${trade.quantity} shares of ${trade.symbol}`,
+      });
+    } else {
+      toast({
+        title: "Trade Failed",
+        description: result.error || "Unknown error occurred",
+        variant: "destructive"
+      });
+    }
+    return result;
   };
 
   const handleClosePosition = (positionId: string) => {
@@ -86,8 +110,8 @@ const TradingDashboard = () => {
     });
   };
 
-  // Show API configuration prominently if not set up
-  if (showApiConfig && !isApiConfigured) {
+  // Show API configuration prominently if not set up and no real data
+  if (!isApiConfigured && showApiConfig) {
     return (
       <ApiSetupPrompt 
         onHideSetup={() => setShowApiConfig(false)}
@@ -95,17 +119,20 @@ const TradingDashboard = () => {
     );
   }
 
-  if (loading && !currentPrice) {
+  // Show loading only if we have no data at all
+  if (loading && !currentPrice && !isConnected) {
     return <LoadingScreen />;
   }
 
   return (
     <TradingDashboardLayout>
-      <ErrorAlert 
-        error={error || ''} 
-        isApiConfigured={isApiConfigured}
-        onShowApiConfig={() => setShowApiConfig(true)}
-      />
+      {error && !isConnected && (
+        <ErrorAlert 
+          error={error} 
+          isApiConfigured={isApiConfigured}
+          onShowApiConfig={() => setShowApiConfig(true)}
+        />
+      )}
 
       <TradingHeader
         symbol={selectedSymbol}
