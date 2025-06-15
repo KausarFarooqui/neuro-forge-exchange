@@ -109,7 +109,7 @@ const NeuralInsightsDashboard = () => {
               <CardContent className="pt-6">
                 <div className="text-center">
                   <h2 className="text-2xl font-bold text-white mb-2">Advanced Portfolio Analytics</h2>
-                  <p className="text-slate-300">
+                  <p className="text-slate-200">
                     Deep risk analysis, performance attribution, and AI-driven rebalancing suggestions
                   </p>
                 </div>
