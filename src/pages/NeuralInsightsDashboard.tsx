@@ -14,6 +14,9 @@ const NeuralInsightsDashboard = () => {
   const [activeTab, setActiveTab] = useState('insights');
   const { portfolio } = useRealTimeTrading();
 
+  console.log('NeuralInsightsDashboard: Rendering with activeTab:', activeTab);
+  console.log('NeuralInsightsDashboard: Portfolio data:', portfolio);
+
   return (
     <MainLayout activeTab={activeTab} setActiveTab={setActiveTab}>
       <div className="container mx-auto px-4 py-8">

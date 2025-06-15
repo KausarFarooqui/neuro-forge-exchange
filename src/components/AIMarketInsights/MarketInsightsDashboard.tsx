@@ -30,8 +30,11 @@ const MarketInsightsDashboard = () => {
   const [sectorSentiments, setSectorSentiments] = useState<SectorSentiment[]>([]);
   const [marketInsights, setMarketInsights] = useState<MarketInsight[]>([]);
   const [overallMarketSentiment, setOverallMarketSentiment] = useState(72);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    console.log('MarketInsightsDashboard: Initializing component...');
+    
     // Initialize with mock data that simulates real market insights
     const initialSectors: SectorSentiment[] = [
       {
@@ -104,9 +107,14 @@ const MarketInsightsDashboard = () => {
 
     setSectorSentiments(initialSectors);
     setMarketInsights(initialInsights);
+    setIsLoading(false);
+    
+    console.log('MarketInsightsDashboard: Data initialized successfully');
 
-    // Real-time updates
+    // Real-time updates simulation
     const interval = setInterval(() => {
+      console.log('MarketInsightsDashboard: Updating real-time data...');
+      
       setSectorSentiments(prev => prev.map(sector => ({
         ...sector,
         sentiment: Math.max(0, Math.min(100, sector.sentiment + (Math.random() - 0.5) * 3)),
@@ -119,7 +127,10 @@ const MarketInsightsDashboard = () => {
       );
     }, 8000);
 
-    return () => clearInterval(interval);
+    return () => {
+      console.log('MarketInsightsDashboard: Cleaning up interval');
+      clearInterval(interval);
+    };
   }, []);
 
   const getSentimentColor = (sentiment: number) => {
@@ -137,9 +148,22 @@ const MarketInsightsDashboard = () => {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-center h-32">
+              <div className="text-cyan-400">Loading AI Market Insights...</div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
-      {/* Overall Market Sentiment */}
       <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-white flex items-center gap-2">
@@ -164,9 +188,13 @@ const MarketInsightsDashboard = () => {
       </Card>
 
       <Tabs defaultValue="sectors" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 bg-slate-800">
-          <TabsTrigger value="sectors" className="text-white">Sector Analysis</TabsTrigger>
-          <TabsTrigger value="insights" className="text-white">Market Insights</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 bg-slate-800/50">
+          <TabsTrigger value="sectors" className="text-white data-[state=active]:bg-cyan-500/20">
+            Sector Analysis
+          </TabsTrigger>
+          <TabsTrigger value="insights" className="text-white data-[state=active]:bg-purple-500/20">
+            Market Insights
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="sectors" className="space-y-4">

@@ -42,8 +42,17 @@ const AdvancedPortfolioAnalytics = ({ portfolio }: AdvancedPortfolioAnalyticsPro
   const [performanceAttribution, setPerformanceAttribution] = useState<PerformanceAttribution[]>([]);
   const [rebalancingSuggestions, setRebalancingSuggestions] = useState<RebalancingSuggestion[]>([]);
   const [portfolioHistory, setPortfolioHistory] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    console.log('AdvancedPortfolioAnalytics: Initializing with portfolio:', portfolio);
+    
+    if (!portfolio || portfolio.totalValue === 0) {
+      console.log('AdvancedPortfolioAnalytics: No portfolio data available');
+      setIsLoading(false);
+      return;
+    }
+
     // Calculate advanced risk metrics
     const calculateRiskMetrics = (): RiskMetrics => {
       const totalValue = portfolio.totalValue;
@@ -76,6 +85,10 @@ const AdvancedPortfolioAnalytics = ({ portfolio }: AdvancedPortfolioAnalyticsPro
 
     // Generate rebalancing suggestions
     const generateRebalancingSuggestions = (): RebalancingSuggestion[] => {
+      if (portfolio.positions.length === 0) {
+        return [];
+      }
+
       return portfolio.positions.slice(0, 4).map(position => {
         const currentWeight = (position.totalValue / portfolio.totalValue) * 100;
         const targetWeight = 20 + Math.random() * 10;
@@ -113,6 +126,9 @@ const AdvancedPortfolioAnalytics = ({ portfolio }: AdvancedPortfolioAnalyticsPro
     setPerformanceAttribution(calculatePerformanceAttribution());
     setRebalancingSuggestions(generateRebalancingSuggestions());
     setPortfolioHistory(generatePortfolioHistory());
+    setIsLoading(false);
+    
+    console.log('AdvancedPortfolioAnalytics: Data initialized successfully');
   }, [portfolio]);
 
   const getRiskColor = (value: number, type: 'sharpe' | 'var' | 'drawdown' | 'beta' | 'volatility') => {
@@ -128,16 +144,65 @@ const AdvancedPortfolioAnalytics = ({ portfolio }: AdvancedPortfolioAnalyticsPro
     }
   };
 
-  if (!riskMetrics) return <div>Loading analytics...</div>;
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-center h-32">
+              <div className="text-cyan-400">Loading Advanced Analytics...</div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!portfolio || portfolio.totalValue === 0) {
+    return (
+      <div className="space-y-6">
+        <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm">
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <div className="text-slate-400 mb-4">No portfolio data available for analysis</div>
+              <div className="text-sm text-slate-500">Make some trades to see advanced analytics</div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!riskMetrics) {
+    return (
+      <div className="space-y-6">
+        <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm">
+          <CardContent className="pt-6">
+            <div className="text-center text-slate-400">
+              Calculating analytics...
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       <Tabs defaultValue="risk" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 bg-slate-800">
-          <TabsTrigger value="risk" className="text-white">Risk Analysis</TabsTrigger>
-          <TabsTrigger value="performance" className="text-white">Performance</TabsTrigger>
-          <TabsTrigger value="allocation" className="text-white">Asset Allocation</TabsTrigger>
-          <TabsTrigger value="rebalancing" className="text-white">Rebalancing</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-4 bg-slate-800/50">
+          <TabsTrigger value="risk" className="text-white data-[state=active]:bg-red-500/20">
+            Risk Analysis
+          </TabsTrigger>
+          <TabsTrigger value="performance" className="text-white data-[state=active]:bg-green-500/20">
+            Performance
+          </TabsTrigger>
+          <TabsTrigger value="allocation" className="text-white data-[state=active]:bg-blue-500/20">
+            Asset Allocation
+          </TabsTrigger>
+          <TabsTrigger value="rebalancing" className="text-white data-[state=active]:bg-purple-500/20">
+            Rebalancing
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="risk" className="space-y-4">
@@ -305,50 +370,56 @@ const AdvancedPortfolioAnalytics = ({ portfolio }: AdvancedPortfolioAnalyticsPro
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {rebalancingSuggestions.map((suggestion) => (
-                  <div
-                    key={suggestion.symbol}
-                    className="p-4 bg-slate-800/30 rounded-lg border border-slate-700/30"
-                  >
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-3">
-                        <span className="text-white font-semibold text-lg">{suggestion.symbol}</span>
-                        <Badge className={
-                          suggestion.action === 'buy' 
-                            ? 'bg-green-500/20 text-green-400 border-green-500/30'
-                            : suggestion.action === 'sell'
-                            ? 'bg-red-500/20 text-red-400 border-red-500/30'
-                            : 'bg-gray-500/20 text-gray-400 border-gray-500/30'
-                        }>
-                          {suggestion.action.toUpperCase()}
-                        </Badge>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-white font-medium">
-                          ${suggestion.amount.toLocaleString()}
+              {rebalancingSuggestions.length === 0 ? (
+                <div className="text-center text-slate-400 py-8">
+                  No rebalancing suggestions available. Add more positions to your portfolio.
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {rebalancingSuggestions.map((suggestion) => (
+                    <div
+                      key={suggestion.symbol}
+                      className="p-4 bg-slate-800/30 rounded-lg border border-slate-700/30"
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <span className="text-white font-semibold text-lg">{suggestion.symbol}</span>
+                          <Badge className={
+                            suggestion.action === 'buy' 
+                              ? 'bg-green-500/20 text-green-400 border-green-500/30'
+                              : suggestion.action === 'sell'
+                              ? 'bg-red-500/20 text-red-400 border-red-500/30'
+                              : 'bg-gray-500/20 text-gray-400 border-gray-500/30'
+                          }>
+                            {suggestion.action.toUpperCase()}
+                          </Badge>
                         </div>
-                        <div className="text-slate-400 text-sm">Suggested Amount</div>
+                        <div className="text-right">
+                          <div className="text-white font-medium">
+                            ${suggestion.amount.toLocaleString()}
+                          </div>
+                          <div className="text-slate-400 text-sm">Suggested Amount</div>
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-4 mb-3">
+                        <div>
+                          <span className="text-slate-400 text-sm">Current Weight:</span>
+                          <div className="text-white font-medium">{suggestion.currentWeight.toFixed(1)}%</div>
+                        </div>
+                        <div>
+                          <span className="text-slate-400 text-sm">Target Weight:</span>
+                          <div className="text-cyan-400 font-medium">{suggestion.targetWeight.toFixed(1)}%</div>
+                        </div>
+                      </div>
+                      
+                      <div className="text-sm text-slate-300 bg-slate-700/30 p-3 rounded">
+                        <strong>Reasoning:</strong> {suggestion.reasoning}
                       </div>
                     </div>
-                    
-                    <div className="grid grid-cols-2 gap-4 mb-3">
-                      <div>
-                        <span className="text-slate-400 text-sm">Current Weight:</span>
-                        <div className="text-white font-medium">{suggestion.currentWeight.toFixed(1)}%</div>
-                      </div>
-                      <div>
-                        <span className="text-slate-400 text-sm">Target Weight:</span>
-                        <div className="text-cyan-400 font-medium">{suggestion.targetWeight.toFixed(1)}%</div>
-                      </div>
-                    </div>
-                    
-                    <div className="text-sm text-slate-300 bg-slate-700/30 p-3 rounded">
-                      <strong>Reasoning:</strong> {suggestion.reasoning}
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
