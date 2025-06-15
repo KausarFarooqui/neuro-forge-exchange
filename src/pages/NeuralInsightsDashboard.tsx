@@ -7,8 +7,12 @@ import MarketInsightsDashboard from '@/components/AIMarketInsights/MarketInsight
 import AdvancedPortfolioAnalytics from '@/components/Portfolio/AdvancedPortfolioAnalytics';
 import { useRealTimeTrading } from '@/hooks/useRealTimeTrading';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Brain, TrendingUp, BarChart3, Target } from 'lucide-react';
+import { Brain, TrendingUp, BarChart3, Target, Users, Shield, Smartphone } from 'lucide-react';
 import EnhancedTradingHub from '@/components/Trading/EnhancedTradingHub';
+import SocialTradingHub from '@/components/Social/SocialTradingHub';
+import BacktestingEngine from '@/components/Professional/BacktestingEngine';
+import AlertSystem from '@/components/Professional/AlertSystem';
+import VoiceTradingInterface from '@/components/Mobile/VoiceTradingInterface';
 
 const NeuralInsightsDashboard = () => {
   const [activeTab, setActiveTab] = useState('insights');
@@ -31,7 +35,7 @@ const NeuralInsightsDashboard = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-5 bg-slate-800/50 backdrop-blur-sm mb-8">
+          <TabsList className="grid w-full grid-cols-8 bg-slate-800/50 backdrop-blur-sm mb-8">
             <TabsTrigger 
               value="insights" 
               className="flex items-center gap-2 text-white data-[state=active]:bg-cyan-500/20"
@@ -66,6 +70,27 @@ const NeuralInsightsDashboard = () => {
             >
               <TrendingUp className="w-4 h-4" />
               Enhanced Trading
+            </TabsTrigger>
+            <TabsTrigger 
+              value="social" 
+              className="flex items-center gap-2 text-white data-[state=active]:bg-blue-500/20"
+            >
+              <Users className="w-4 h-4" />
+              Social Trading
+            </TabsTrigger>
+            <TabsTrigger 
+              value="professional" 
+              className="flex items-center gap-2 text-white data-[state=active]:bg-yellow-500/20"
+            >
+              <Shield className="w-4 h-4" />
+              Pro Tools
+            </TabsTrigger>
+            <TabsTrigger 
+              value="mobile" 
+              className="flex items-center gap-2 text-white data-[state=active]:bg-pink-500/20"
+            >
+              <Smartphone className="w-4 h-4" />
+              Mobile Features
             </TabsTrigger>
           </TabsList>
 
@@ -137,6 +162,66 @@ const NeuralInsightsDashboard = () => {
               </CardContent>
             </Card>
             <EnhancedTradingHub />
+          </TabsContent>
+
+          <TabsContent value="social" className="space-y-6">
+            <Card className="bg-slate-950/80 border-blue-500/20 backdrop-blur-sm">
+              <CardContent className="pt-6">
+                <div className="text-center">
+                  <h2 className="text-2xl font-bold text-white mb-2">Social Trading Hub</h2>
+                  <p className="text-slate-200">
+                    Copy top traders, share ideas, and collaborate with the trading community
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+            <SocialTradingHub />
+          </TabsContent>
+
+          <TabsContent value="professional" className="space-y-6">
+            <Card className="bg-slate-950/80 border-yellow-500/20 backdrop-blur-sm">
+              <CardContent className="pt-6">
+                <div className="text-center">
+                  <h2 className="text-2xl font-bold text-white mb-2">Professional Tools</h2>
+                  <p className="text-slate-200">
+                    Advanced backtesting, automated alerts, and institutional-grade analytics
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Tabs defaultValue="backtesting" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 bg-slate-800/50">
+                <TabsTrigger value="backtesting" className="text-white data-[state=active]:bg-cyan-500/20">
+                  Backtesting Engine
+                </TabsTrigger>
+                <TabsTrigger value="alerts" className="text-white data-[state=active]:bg-orange-500/20">
+                  Alert System
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="backtesting">
+                <BacktestingEngine />
+              </TabsContent>
+              
+              <TabsContent value="alerts">
+                <AlertSystem />
+              </TabsContent>
+            </Tabs>
+          </TabsContent>
+
+          <TabsContent value="mobile" className="space-y-6">
+            <Card className="bg-slate-950/80 border-pink-500/20 backdrop-blur-sm">
+              <CardContent className="pt-6">
+                <div className="text-center">
+                  <h2 className="text-2xl font-bold text-white mb-2">Mobile-First Features</h2>
+                  <p className="text-slate-200">
+                    Voice trading, biometric authentication, and mobile-optimized interface
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+            <VoiceTradingInterface />
           </TabsContent>
         </Tabs>
       </div>
