@@ -63,11 +63,11 @@ const NeuralInsightsDashboard = () => {
           </TabsList>
 
           <TabsContent value="insights" className="space-y-6">
-            <Card className="bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border-cyan-500/20 backdrop-blur-sm">
+            <Card className="bg-slate-950/80 border-cyan-500/20 backdrop-blur-sm">
               <CardContent className="pt-6">
                 <div className="text-center">
                   <h2 className="text-2xl font-bold text-white mb-2">AI Market Insights</h2>
-                  <p className="text-slate-300">
+                  <p className="text-slate-200">
                     Real-time market sentiment analysis and sector predictions powered by advanced AI
                   </p>
                 </div>
@@ -77,11 +77,11 @@ const NeuralInsightsDashboard = () => {
           </TabsContent>
 
           <TabsContent value="sentiment" className="space-y-6">
-            <Card className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-purple-500/20 backdrop-blur-sm">
+            <Card className="bg-slate-950/80 border-purple-500/20 backdrop-blur-sm">
               <CardContent className="pt-6">
                 <div className="text-center">
                   <h2 className="text-2xl font-bold text-white mb-2">Market Sentiment Radar</h2>
-                  <p className="text-slate-300">
+                  <p className="text-slate-200">
                     Track real-time sentiment across technology sectors and emerging markets
                   </p>
                 </div>
@@ -91,11 +91,11 @@ const NeuralInsightsDashboard = () => {
           </TabsContent>
 
           <TabsContent value="portfolio" className="space-y-6">
-            <Card className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 border-green-500/20 backdrop-blur-sm">
+            <Card className="bg-slate-950/80 border-green-500/20 backdrop-blur-sm">
               <CardContent className="pt-6">
                 <div className="text-center">
                   <h2 className="text-2xl font-bold text-white mb-2">AI-Powered Portfolio</h2>
-                  <p className="text-slate-300">
+                  <p className="text-slate-200">
                     Intelligent portfolio management with AI predictions and real-time trading
                   </p>
                 </div>
@@ -105,7 +105,7 @@ const NeuralInsightsDashboard = () => {
           </TabsContent>
 
           <TabsContent value="analytics" className="space-y-6">
-            <Card className="bg-gradient-to-r from-orange-500/10 to-red-500/10 border-orange-500/20 backdrop-blur-sm">
+            <Card className="bg-slate-950/80 border-orange-500/20 backdrop-blur-sm">
               <CardContent className="pt-6">
                 <div className="text-center">
                   <h2 className="text-2xl font-bold text-white mb-2">Advanced Portfolio Analytics</h2>
