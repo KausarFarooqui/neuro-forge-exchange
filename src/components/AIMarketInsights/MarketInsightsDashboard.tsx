@@ -1,10 +1,11 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Brain, TrendingUp, TrendingDown, AlertTriangle, Target, Zap } from 'lucide-react';
+import NewsImpactScoring from './NewsImpactScoring';
+import SectorRotationPredictions from './SectorRotationPredictions';
 
 interface SectorSentiment {
   sector: string;
@@ -188,12 +189,18 @@ const MarketInsightsDashboard = () => {
       </Card>
 
       <Tabs defaultValue="sectors" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 bg-slate-800/50">
+        <TabsList className="grid w-full grid-cols-4 bg-slate-800/50">
           <TabsTrigger value="sectors" className="text-white data-[state=active]:bg-cyan-500/20">
             Sector Analysis
           </TabsTrigger>
           <TabsTrigger value="insights" className="text-white data-[state=active]:bg-purple-500/20">
             Market Insights
+          </TabsTrigger>
+          <TabsTrigger value="news" className="text-white data-[state=active]:bg-orange-500/20">
+            News Impact
+          </TabsTrigger>
+          <TabsTrigger value="rotation" className="text-white data-[state=active]:bg-green-500/20">
+            Sector Rotation
           </TabsTrigger>
         </TabsList>
 
@@ -316,6 +323,14 @@ const MarketInsightsDashboard = () => {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="news" className="space-y-4">
+          <NewsImpactScoring />
+        </TabsContent>
+
+        <TabsContent value="rotation" className="space-y-4">
+          <SectorRotationPredictions />
         </TabsContent>
       </Tabs>
     </div>

@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import MainLayout from '@/components/Layout/MainLayout';
@@ -9,6 +8,7 @@ import AdvancedPortfolioAnalytics from '@/components/Portfolio/AdvancedPortfolio
 import { useRealTimeTrading } from '@/hooks/useRealTimeTrading';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Brain, TrendingUp, BarChart3, Target } from 'lucide-react';
+import EnhancedTradingHub from '@/components/Trading/EnhancedTradingHub';
 
 const NeuralInsightsDashboard = () => {
   const [activeTab, setActiveTab] = useState('insights');
@@ -31,7 +31,7 @@ const NeuralInsightsDashboard = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 bg-slate-800/50 backdrop-blur-sm mb-8">
+          <TabsList className="grid w-full grid-cols-5 bg-slate-800/50 backdrop-blur-sm mb-8">
             <TabsTrigger 
               value="insights" 
               className="flex items-center gap-2 text-white data-[state=active]:bg-cyan-500/20"
@@ -59,6 +59,13 @@ const NeuralInsightsDashboard = () => {
             >
               <BarChart3 className="w-4 h-4" />
               Advanced Analytics
+            </TabsTrigger>
+            <TabsTrigger 
+              value="trading" 
+              className="flex items-center gap-2 text-white data-[state=active]:bg-red-500/20"
+            >
+              <TrendingUp className="w-4 h-4" />
+              Enhanced Trading
             </TabsTrigger>
           </TabsList>
 
@@ -116,6 +123,20 @@ const NeuralInsightsDashboard = () => {
               </CardContent>
             </Card>
             <AdvancedPortfolioAnalytics portfolio={portfolio} />
+          </TabsContent>
+
+          <TabsContent value="trading" className="space-y-6">
+            <Card className="bg-slate-950/80 border-red-500/20 backdrop-blur-sm">
+              <CardContent className="pt-6">
+                <div className="text-center">
+                  <h2 className="text-2xl font-bold text-white mb-2">Enhanced Trading Platform</h2>
+                  <p className="text-slate-200">
+                    Options, crypto, futures trading with advanced analytics and paper trading mode
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+            <EnhancedTradingHub />
           </TabsContent>
         </Tabs>
       </div>
